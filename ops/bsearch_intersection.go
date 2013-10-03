@@ -8,6 +8,8 @@ type intersection struct {
 	nodes []QueryOp
 }
 
+// QueryOp that is the intersection of the sets added to this container.
+// QueryOps can be added to the container with this constructor or later with Add.
 func NewIntersection(n ...QueryOp) QueryContainer {
 	var it intersection
 

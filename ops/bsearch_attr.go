@@ -9,6 +9,7 @@ type attr struct {
 	currptr int
 }
 
+// QueryOp that is the set of all documents for one attribute.
 func NewAttr(in *index.Index, key string) QueryOp {
 	a := in.Attrs[key]
 	if a == nil {
