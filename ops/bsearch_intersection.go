@@ -4,30 +4,30 @@ import (
 	"bsearch/index"
 )
 
-type Intersection struct {
+type intersection struct {
 	nodes []QueryOp
 }
 
-func NewIntersection(n ...QueryOp) *Intersection {
-	var it Intersection
+func NewIntersection(n ...QueryOp) QueryContainer {
+	var it intersection
 
 	it.Add(n...)
 
 	return &it
 }
 
-func (it *Intersection) Add(n ...QueryOp) {
+func (it *intersection) Add(n ...QueryOp) {
 	it.nodes = append(it.nodes, n...)
 }
 
-func (it *Intersection) CurrentDoc() *index.IbDoc {
+func (it *intersection) CurrentDoc() *index.IbDoc {
 	if len(it.nodes) == 0 {
 		return nil
 	}
 	return it.nodes[0].CurrentDoc()
 }
 
-func (it *Intersection) NextDoc(search *index.IbDoc) *index.IbDoc {
+func (it *intersection) NextDoc(search *index.IbDoc) *index.IbDoc {
 	var d *index.IbDoc
 
 	start_node := -1
