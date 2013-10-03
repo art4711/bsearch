@@ -4,27 +4,27 @@ import (
 	"bsearch/index"
 )
 
-type Attr struct {
+type attr struct {
 	docs    []index.IbDoc
 	currptr int
 }
 
-func NewAttr(in *index.Index, key string) *Attr {
+func NewAttr(in *index.Index, key string) QueryOp {
 	a := in.Attrs[key]
 	if a == nil {
 		return nil
 	}
-	return &Attr{in.Attrs[key], 0}
+	return &attr{in.Attrs[key], 0}
 }
 
-func (ba *Attr) CurrentDoc() *index.IbDoc {
+func (ba *attr) CurrentDoc() *index.IbDoc {
 	if ba.currptr == -1 {
 		return nil
 	}
 	return &ba.docs[ba.currptr]
 }
 
-func (ba *Attr) NextDoc(search *index.IbDoc) *index.IbDoc {
+func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
 	from := ba.currptr
 	to := len(ba.docs) - 1
 
