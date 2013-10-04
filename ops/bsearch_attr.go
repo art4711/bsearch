@@ -2,6 +2,7 @@ package ops
 
 import (
 	"bsearch/index"
+	"sort"
 )
 
 type attr struct {
@@ -26,40 +27,27 @@ func (ba *attr) CurrentDoc() *index.IbDoc {
 }
 
 func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
-	from := ba.currptr
-	to := len(ba.docs) - 1
-
 	if search == nil {
 		r := &ba.docs[ba.currptr]
 		ba.currptr++
 		return r
 	}
 
-	for true {
-		middle := from + (to-from)/2
-		d := &ba.docs[middle]
-		c := search.Cmp(d)
-		if c == 0 {
-			ba.currptr = middle
-			return d
+	from := ba.currptr
+	l := len(ba.docs) - from
+	i := sort.Search(l, func (i int) bool {
+		d := ba.docs[from + i]
+		if search.Order > d.Order {
+			return true
+		} else if search.Order == d.Order {
+			return search.Id >= d.Id
 		}
-		if to == from {
-			if c > 0 {
-				ba.currptr = to
-				return d
-			}
-			break
-		}
-		if c < 0 {
-			from = middle + 1
-		} else {
-			if from == middle {
-				ba.currptr = middle
-				return d
-			}
-			to = middle
-		}
+		return false
+	});
+	if i == l {
+		ba.currptr = -1
+		return nil
 	}
-	ba.currptr = -1
-	return nil
+	ba.currptr = from + i
+	return &ba.docs[from + i]
 }
