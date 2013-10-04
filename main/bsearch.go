@@ -30,7 +30,7 @@ func main() {
 	a1 := ops.NewAttr(in, "root:10")
 	a2 := ops.NewAttr(in, "magic:boll")
 	a3 := ops.NewAttr(in, "status:active")
-	q := ops.NewIntersection(a1, a2)
+	q := ops.NewIntersection(ops.NewUnion(a1, a2), a3)
 	q.Add(a3)
 	var d *index.IbDoc
 	for true {
