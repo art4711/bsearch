@@ -5,9 +5,7 @@ import (
 	"container/heap"
 )
 
-type union struct {
-	nodes []QueryOp
-}
+type union []QueryOp
 
 func NewUnion(n ...QueryOp) QueryContainer {
 	var un union
@@ -53,41 +51,41 @@ func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
 }
 
 // sort.Interface
-func (un *union) Len() int {
-	return len(un.nodes)
+func (un union) Len() int {
+	return len(un)
 }
 
 
 // sort.Interface
-func (un *union) Less(i, j int) bool {
-	a := un.nodes[i].CurrentDoc()
-	b := un.nodes[j].CurrentDoc()
+func (un union) Less(i, j int) bool {
+	a := un[i].CurrentDoc()
+	b := un[j].CurrentDoc()
 	return a.Cmp(b) > 0		// we want a max-heap
 }
 
 // sort.Interface
-func (un *union) Swap(i, j int) {
-	un.nodes[i], un.nodes[j] = un.nodes[j], un.nodes[i]
+func (un union) Swap(i, j int) {
+	un[i], un[j] = un[j], un[i]
 }
 
 // heap.Interface
 func (un *union) Push(x interface{}) {
-	un.nodes = append(un.nodes, x.(QueryOp))
+	*un = append(*un, x.(QueryOp))
 }
 
 // heap.Interface
 func (un *union) Pop() interface{} {
-	l := len(un.nodes)
-	r := un.nodes[l - 1]
-	un.nodes = un.nodes[:l-1]
+	l := len(*un)
+	r := (*un)[l - 1]
+	*un = (*un)[:l-1]
 	return r
 }
 
 // Returns the head of the heap.
-func (un *union) head() QueryOp {
-	l := len(un.nodes)
+func (un union) head() QueryOp {
+	l := len(un)
 	if l > 0 {
-		return un.nodes[l - 1]
+		return un[l - 1]
 	}
 	return nil
 	

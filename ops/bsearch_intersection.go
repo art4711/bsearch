@@ -4,9 +4,7 @@ import (
 	"bsearch/index"
 )
 
-type intersection struct {
-	nodes []QueryOp
-}
+type intersection []QueryOp
 
 // QueryOp that is the intersection of the sets added to this container.
 // QueryOps can be added to the container with this constructor or later with Add.
@@ -19,23 +17,23 @@ func NewIntersection(n ...QueryOp) QueryContainer {
 }
 
 func (it *intersection) Add(n ...QueryOp) {
-	it.nodes = append(it.nodes, n...)
+	*it = append(*it, n...)
 }
 
-func (it *intersection) CurrentDoc() *index.IbDoc {
-	if len(it.nodes) == 0 {
+func (it intersection) CurrentDoc() *index.IbDoc {
+	if len(it) == 0 {
 		return nil
 	}
-	return it.nodes[0].CurrentDoc()
+	return (it)[0].CurrentDoc()
 }
 
-func (it *intersection) NextDoc(search *index.IbDoc) *index.IbDoc {
+func (it intersection) NextDoc(search *index.IbDoc) *index.IbDoc {
 	var d *index.IbDoc
 
 	start_node := -1
 
 	for true {
-		for i, n := range it.nodes {
+		for i, n := range it {
 			if i == start_node {
 				return d
 			}
