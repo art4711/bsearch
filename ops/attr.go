@@ -5,24 +5,19 @@ import (
 	"sort"
 )
 
-type attr struct {
-	docs    []index.IbDoc
-}
+type attr []index.IbDoc
 
 // QueryOp that is the set of all documents for one attribute.
 func NewAttr(in *index.Index, key string) QueryOp {
-	a := in.Attrs[key]
-	if a == nil {
-		return nil
-	}
-	return &attr{in.Attrs[key]}
+	a := attr(in.Attrs[key])
+	return &a
 }
 
-func (ba *attr) CurrentDoc() *index.IbDoc {
-	if ba.docs == nil {
+func (ba attr) CurrentDoc() *index.IbDoc {
+	if ba == nil {
 		return nil
 	}
-	return &ba.docs[0]
+	return &ba[0]
 }
 
 func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
@@ -30,9 +25,9 @@ func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
 		return ba.CurrentDoc()
 	}
 
-	l := len(ba.docs)
+	l := len(*ba)
 	i := sort.Search(l, func (i int) bool {
-		d := ba.docs[i]
+		d := (*ba)[i]
 		if search.Order > d.Order {
 			return true
 		} else if search.Order == d.Order {
@@ -41,9 +36,9 @@ func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
 		return false
 	});
 	if i == l {
-		ba.docs = nil
+		ba = nil
 		return nil
 	}
-	ba.docs = ba.docs[i:]
-	return &ba.docs[0]
+	(*ba) = (*ba)[i:]
+	return &(*ba)[0]
 }
