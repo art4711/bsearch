@@ -16,23 +16,20 @@ func NewUnion(n ...QueryOp) QueryContainer {
 	return &un
 }
 
-// QueryContainer
 func (un *union) Add(nodes ...QueryOp) {
 	for _, n := range(nodes) {
 		heap.Push(un, n)
 	}
 }
 
-// QueryOp
 func (un *union) CurrentDoc() *index.IbDoc {
-	h := un.head()
+	h := un.peek()
 	if h == nil {
 		return nil
 	}
 	return h.CurrentDoc()
 }
 
-// QueryOp
 func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
 	d := un.CurrentDoc()
 	if search == nil {
@@ -50,30 +47,35 @@ func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
 	return d
 }
 
-// sort.Interface
+// Len returns the number of elements in the union.
+// Needed to implement heap.Interface.
 func (un union) Len() int {
 	return len(un)
 }
 
-
-// sort.Interface
+// Compares two elements and returns which one is bigger than the other.
+// Needed to implement heap.Interface.
+// It's called Less because the heap is a min heap, but we want a max heap.
 func (un union) Less(i, j int) bool {
 	a := un[i].CurrentDoc()
 	b := un[j].CurrentDoc()
 	return a.Cmp(b) > 0		// we want a max-heap
 }
 
-// sort.Interface
+// Swap to elements in the union.
+// Needed to implement heap.Interface.
 func (un union) Swap(i, j int) {
 	un[i], un[j] = un[j], un[i]
 }
 
-// heap.Interface
+// Add an element at the end of the union.
+// Needed to implement heap.Interface.
 func (un *union) Push(x interface{}) {
 	*un = append(*un, x.(QueryOp))
 }
 
-// heap.Interface
+// Remove one element from the end of the union.
+// Needed to implement heap.Interface.
 func (un *union) Pop() interface{} {
 	l := len(*un)
 	r := (*un)[l - 1]
@@ -81,8 +83,8 @@ func (un *union) Pop() interface{} {
 	return r
 }
 
-// Returns the head of the heap.
-func (un union) head() QueryOp {
+// Peek at the head of the heap.
+func (un union) peek() QueryOp {
 	l := len(un)
 	if l > 0 {
 		return un[l - 1]
