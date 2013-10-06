@@ -79,3 +79,7 @@ func (br *blob_reader) get_attr_name(a *IbInvattr) string {
 func (br *blob_reader) get_attr_docs(a *IbInvattr) []IbDoc {
 	return *(*[]IbDoc)(br.reslice(unsafe.Sizeof(IbDoc{}), a.Docs_offs, a.Docslen, true))
 }
+
+func (br *blob_reader) get_meta() []byte {
+	return br.mmap_data[br.Hdr.meta_off : br.Hdr.meta_off + br.Hdr.meta_sz]
+}
