@@ -89,6 +89,5 @@ func (un union) peek() QueryOp {
 	if l > 0 {
 		return un[l - 1]
 	}
-	return nil
-	
+	return nil	
 }
