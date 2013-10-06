@@ -32,6 +32,9 @@ func main() {
 	a3 := ops.NewAttr(in, "status:active")
 	q := ops.NewIntersection(ops.NewUnion(a1, a2), a3)
 	q.Add(a3)
+
+	fmt.Printf("%v\n", in.Header())
+
 	var d *index.IbDoc
 	for true {
 		d = q.NextDoc(d)
