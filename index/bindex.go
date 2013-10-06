@@ -1,9 +1,15 @@
 package index
 
+import (
+	"bconf"
+)
+
 type Index struct {
 	br    *blob_reader
 	Docs  map[uint32][]byte
 	Attrs map[string][]IbDoc
+	Meta bconf.Bconf
+	header string
 }
 
 func Open(name string) (*Index, error) {
@@ -24,9 +30,26 @@ func Open(name string) (*Index, error) {
 	for _, a := range in.br.get_invattrs() {
 		in.Attrs[in.br.get_attr_name(&a)] = in.br.get_attr_docs(&a)
 	}
+
+	in.Meta.LoadJson(in.br.get_meta())
+
+	in.Header()	// Pre-cache the header to avoid race conditions.
+
 	return &in, nil
 }
 
-func (in *Index) Close() {
+func (in Index) Header() string {
+	if in.header == "" {
+		in.Meta.GetNode("attr", "order").ForeachSorted(func(k, v string) {
+			if in.header != "" {
+				in.header += "\t"
+			}
+			in.header += v
+		})
+	}
+	return in.header
+}
+
+func (in Index) Close() {
 	in.br.close()
 }
