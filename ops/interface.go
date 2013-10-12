@@ -29,3 +29,4 @@ type QueryContainer interface {
 	// Add adds one or more QueryOp to the container.
 	Add(...QueryOp)
 }
+

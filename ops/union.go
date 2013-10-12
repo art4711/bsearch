@@ -31,14 +31,30 @@ func (un *union) CurrentDoc() *index.IbDoc {
 }
 
 func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
+	/*
+	 * XXX - it doesn't seem to be easy to implement that search == nil always
+	 * returns the next document without also removing the ability for
+	 * CurrentDoc to be easily implementable. Choose one and change the
+	 * documentation of the interface.
+	 */
 	d := un.CurrentDoc()
 	if search == nil {
+		// XXX - maybe search = d?
+		// But then we'll never return the first document when always called
+		// with nil.
 		return d
 	}
 	// Chew up all documents bigger than search
 	for d != nil && search.Cmp(d) < 0 {
+		/*
+		 * We could use a heap.UpdateHead here to avoid all those expensive
+		 * Pop/Push. It is trivially implemented with heap.down(h, 0, h.Len()),
+		 * but unfortunately that's not exposed to us. Another alternative is
+		 * heap.Init, but that's too brutal too.
+		 */
 		n := heap.Pop(un).(QueryOp)
-		// Only put the element back into the heap if it's not empty.
+
+		/* Only put the element back into the heap if it's not empty. */
 		if n.NextDoc(search) != nil {
 			heap.Push(un, n)
 		}
