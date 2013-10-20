@@ -1,17 +1,15 @@
 package index
 
 import (
-	"bytes"
 	"os"
-	"reflect"
-	"syscall"
 	"unsafe"
+	"github.com/art4711/filemap"
+	"log"
 )
 
 type blob_reader struct {
 	file      *os.File
-	mmap_data []byte
-	mmap_size int
+	fmap	  *filemap.Map
 	Hdr       *IbHeader
 }
 
@@ -23,40 +21,35 @@ func open_blob_reader(name string) (*blob_reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	s, err := br.file.Stat()
+
+	br.fmap, err = filemap.NewReader(br.file)
 	if err != nil {
 		br.file.Close()
 		return nil, err
 	}
-	br.mmap_size = int(s.Size())
-	br.mmap_data, err = syscall.Mmap(int(br.file.Fd()), 0, br.mmap_size, syscall.PROT_READ, syscall.MAP_SHARED)
-	if err != nil {
-		br.file.Close()
-		return nil, err
-	}
+
 	br.Hdr = br.get_header()
 	return &br, nil
 }
 
 func (br *blob_reader) close() {
-	syscall.Munmap(br.mmap_data)
+	br.fmap.Close()
 	br.file.Close()
 }
 
 func (br *blob_reader) get_header() *IbHeader {
-	return (*IbHeader)(unsafe.Pointer(&br.mmap_data[0]))
+	return &(*(*[]IbHeader)(br.reslice(unsafe.Sizeof(IbHeader{}), 0, 1, false)))[0]
 }
 
 func (br *blob_reader) reslice(len uintptr, off, sz uint64, sz_in_bytes bool) unsafe.Pointer {
 	if sz_in_bytes {
 		sz /= uint64(len)
 	}
-	data := br.mmap_data[int(off) : int(off)+int(len)*int(sz)]
-	slice := (*reflect.SliceHeader)(unsafe.Pointer(&data))
-	slice.Len /= int(len)
-	slice.Cap = slice.Len
-
-	return unsafe.Pointer(slice)
+	r, err := br.fmap.Slice(len, off, sz)
+	if err != nil {
+		log.Fatal("filemap.Slice: %v", err)
+	} 
+	return r
 }
 
 func (br *blob_reader) get_documents() []IbDocument {
@@ -64,7 +57,11 @@ func (br *blob_reader) get_documents() []IbDocument {
 }
 
 func (br *blob_reader) get_document_data(d *IbDocument) []byte {
-	return br.mmap_data[d.Blob_offs : int(d.Blob_offs)+int(d.Doclen)-1]
+	r, err := br.fmap.Bytes(d.Blob_offs, uint64(d.Doclen) - 1)
+	if err != nil {
+		log.Fatal("get_document_data: %v", err)
+	}
+	return r
 }
 
 func (br *blob_reader) get_invattrs() []IbInvattr {
@@ -72,8 +69,11 @@ func (br *blob_reader) get_invattrs() []IbInvattr {
 }
 
 func (br *blob_reader) get_attr_name(a *IbInvattr) string {
-	s := br.mmap_data[a.Attr_offs:]
-	return string(s[:bytes.IndexByte(s, 0)])
+	r, err := br.fmap.CString(a.Attr_offs)
+	if err != nil {
+		log.Fatal("get_attr_name: %v", err)
+	}
+	return string(r)
 }
 
 func (br *blob_reader) get_attr_docs(a *IbInvattr) []IbDoc {
@@ -81,5 +81,9 @@ func (br *blob_reader) get_attr_docs(a *IbInvattr) []IbDoc {
 }
 
 func (br *blob_reader) get_meta() []byte {
-	return br.mmap_data[br.Hdr.meta_off : br.Hdr.meta_off + br.Hdr.meta_sz]
+	r, err := br.fmap.Bytes(br.Hdr.meta_off, br.Hdr.meta_sz)
+	if err != nil {
+		log.Fatal("get_meta: %v", err)
+	}
+	return r
 }
