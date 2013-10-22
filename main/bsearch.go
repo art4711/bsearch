@@ -2,8 +2,8 @@ package main
 
 import (
 	"bsearch/index"
-//	"bsearch/ops"
 	"bsearch/parser"
+	"bsearch/ops"
 	"fmt"
 	"os"
 	"flag"
@@ -28,15 +28,10 @@ func main() {
 	}
 	defer in.Close()
 
-	p := parser.Parse(in, "17 lim:42 root:10 OR magic:boll")
-/*	fmt.Printf("%v\n", p)
-
-	a1 := ops.NewAttr(in, "root:10")
-	a2 := ops.NewAttr(in, "magic:boll")
-	a3 := ops.NewAttr(in, "status:active")
-	q := ops.NewIntersection(ops.NewUnion(a1, a2), a3)
-	q.Add(a3)*/
+	p := parser.Parse(in, "0 lim:10 root:10 OR magic:boll status:active")
 	q := p.Stack[0]
+
+	ops.Dump(q, 0)
 
 	fmt.Printf("%v\n", in.Header())
 
