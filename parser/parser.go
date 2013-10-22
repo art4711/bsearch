@@ -5,7 +5,6 @@ import (
 	"log"
 	"bsearch/ops"
 	"bsearch/index"
-	"fmt"
 )
 
 type Query struct {
@@ -76,6 +75,5 @@ func Parse(i *index.Index, s string) Query {
 		log.Fatal(err)
 	}
 	q.Execute()
-	fmt.Printf("%v\n", q.Query)
 	return q.Query
 }
