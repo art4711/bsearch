@@ -28,5 +28,7 @@ func Dump(o interface{}, indent int) {
 		Dump(o.(*limit).next, indent+1)
 	case *offset:
 		Dump(o.(*offset).next, indent+1)
+	case *count_all:
+		Dump(o.(*count_all).next, indent+1)
 	}
 }

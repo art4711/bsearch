@@ -20,11 +20,17 @@ Q3 <- Params?
 Offset <- < number > s	{ p.Offset(buffer[begin:end]) }
 Limit <- 'lim:' < number > s { p.Limit(buffer[begin:end]) }
 
-Params <- { p.StartIntersection() } (Param s)+ Param s? /
-	{ p.StartIntersection(); fmt.Printf("one attribute\n") } Param s? /
+Params <- CountAllAttrs / Attrs
+
+CountAllAttrs <- CountAll Attrs { p.PopAdd() } / Attrs
+
+CountAll <- 'count_all(' < counter_name > ')' s { p.CountAll(buffer[begin:end]) }
+
+Attrs <- { p.StartIntersection() } (Attr s)+ Attr s? /
+	{ p.StartIntersection(); fmt.Printf("one attribute\n") } Attr s? /
 	s? { fmt.Printf("no attributes\n") }
 
-Param <-  AttrUnion / Attribute
+Attr <-  AttrUnion / Attribute
 
 Attribute <- < attr_name ':' attr_value > { p.Attr(buffer[begin:end]) }
 AttrUnion <- { p.StartUnion() } AttributeORList { p.PopAdd() }
@@ -32,5 +38,7 @@ AttributeORList <- Attribute s 'OR' s Attribute
 
 number <- [0-9]+
 s <- ' '+
-attr_name <- [a-z0-9]+
-attr_value <- [a-z0-9]+
+counter_name <- generic_name
+attr_name <- generic_name
+attr_value <- generic_name
+generic_name <- [a-z0-9]+

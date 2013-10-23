@@ -45,3 +45,7 @@ func (o *offset) NextDoc(s *index.IbDoc) *index.IbDoc {
 	}
 	return o.next.NextDoc(s)
 }
+
+func (o offset) ProcessHeaders(hc HeaderCollector) {
+	o.next.ProcessHeaders(hc)
+}

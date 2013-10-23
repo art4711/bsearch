@@ -42,3 +42,6 @@ func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
 	(*ba) = (*ba)[i:]
 	return &(*ba)[0]
 }
+
+func (ba attr) ProcessHeaders(hc HeaderCollector) {
+}

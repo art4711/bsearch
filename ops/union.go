@@ -107,3 +107,9 @@ func (un union) peek() QueryOp {
 	}
 	return nil
 }
+
+func (un union) ProcessHeaders(hc HeaderCollector) {
+	for _, n := range un {
+		n.ProcessHeaders(hc)
+	}
+}

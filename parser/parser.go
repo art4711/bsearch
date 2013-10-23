@@ -36,6 +36,10 @@ func (q *Query) StartUnion() {
 	q.push(ops.NewUnion())
 }
 
+func (q *Query) CountAll(s string) {
+	q.push(ops.CountAll(s))
+}
+
 func (q *Query) PopAdd() {
 	q.add(q.pop())
 }
@@ -75,3 +79,4 @@ func Parse(i *index.Index, s string) Query {
 	q.Execute()
 	return q.Query
 }
+

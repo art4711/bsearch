@@ -4,6 +4,10 @@ import (
 	"bsearch/index"
 )
 
+type HeaderCollector interface {
+	Add(key, value string)
+}
+
 // QueryOp is the interface for search queries implemented by everything
 // that will return documents. Each QueryOp is assumed to define access
 // to a sorted set of documents sorted on IbDoc.order.
@@ -19,6 +23,9 @@ type QueryOp interface {
 	// returned document or the first document if no document has been
 	// returned yet.
 	NextDoc(search *index.IbDoc) *index.IbDoc
+
+	// Recursively adds any headers this might need to return.
+	ProcessHeaders(hc HeaderCollector)
 }
 
 // QueryContainer is an interface for ops that not only implement sets of

@@ -15,6 +15,12 @@ func usage() {
 	os.Exit(1)
 }
 
+type headers map[string]string
+
+func (h headers) Add(k, v string) {
+	h[k] = v
+}
+
 func main() {
 	flag.Parse()
 	if flag.NArg() != 1 {
@@ -28,7 +34,7 @@ func main() {
 	}
 	defer in.Close()
 
-	p := parser.Parse(in, "0 lim:10 root:10 OR magic:boll status:active")
+	p := parser.Parse(in, "0 lim:10 count_all(hej) root:10 OR magic:boll status:active")
 	q := p.Stack[0]
 
 	ops.Dump(q, 0)
@@ -44,4 +50,9 @@ func main() {
 		fmt.Printf("%v\n", string(in.Docs[d.Id]))
 		d = d.Inc()
 	}
+	h := make(headers)
+	q.ProcessHeaders(h)
+	for k, v := range h {
+		fmt.Printf("info:%v:%v\n", k, v)
+	} 
 }

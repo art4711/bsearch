@@ -52,3 +52,9 @@ func (it intersection) NextDoc(search *index.IbDoc) *index.IbDoc {
 	}
 	return nil
 }
+
+func (it intersection) ProcessHeaders(hc HeaderCollector) {
+	for _, n := range it {
+		n.ProcessHeaders(hc)
+	}
+}
