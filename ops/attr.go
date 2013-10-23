@@ -26,7 +26,7 @@ func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
 	}
 
 	l := len(*ba)
-	i := sort.Search(l, func (i int) bool {
+	i := sort.Search(l, func(i int) bool {
 		d := (*ba)[i]
 		if search.Order > d.Order {
 			return true
@@ -34,7 +34,7 @@ func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
 			return search.Id >= d.Id
 		}
 		return false
-	});
+	})
 	if i == l {
 		ba = nil
 		return nil

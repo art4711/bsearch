@@ -2,11 +2,11 @@ package main
 
 import (
 	"bsearch/index"
-	"bsearch/parser"
 	"bsearch/ops"
+	"bsearch/parser"
+	"flag"
 	"fmt"
 	"os"
-	"flag"
 )
 
 func usage() {

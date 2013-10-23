@@ -6,12 +6,12 @@ import (
 )
 
 type limit struct {
-	lim uint
+	lim  uint
 	next QueryOp
 }
 
 func NewLimit(lim uint) QueryContainer {
-	return &limit{lim:lim}
+	return &limit{lim: lim}
 }
 
 func (l *limit) Add(n ...QueryOp) {

@@ -7,11 +7,11 @@ import (
 
 type offset struct {
 	offset uint
-	next QueryOp
+	next   QueryOp
 }
 
 func NewOffset(o uint) QueryContainer {
-	return &offset{offset:o}
+	return &offset{offset: o}
 }
 
 func (o *offset) Add(n ...QueryOp) {

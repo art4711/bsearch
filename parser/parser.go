@@ -1,15 +1,15 @@
 package parser
 
 import (
-	"strconv"
-	"log"
-	"bsearch/ops"
 	"bsearch/index"
+	"bsearch/ops"
+	"log"
+	"strconv"
 )
 
 type Query struct {
 	Stack []ops.QueryContainer
-	in *index.Index
+	in    *index.Index
 }
 
 func (q *Query) Limit(l string) {
@@ -52,7 +52,7 @@ func (q *Query) pop() ops.QueryContainer {
 }
 
 func (q *Query) add(o ops.QueryOp) {
-	q.Stack[len(q.Stack) - 1].Add(o)
+	q.Stack[len(q.Stack)-1].Add(o)
 }
 
 func (q *Query) Attr(a string) {
@@ -64,7 +64,7 @@ func (q *Query) SetIndex(i *index.Index) {
 }
 
 func Parse(i *index.Index, s string) Query {
-	q := &QueryParser{Buffer:s}
+	q := &QueryParser{Buffer: s}
 
 	q.SetIndex(i)
 	q.Init()

@@ -18,15 +18,15 @@ func dumpIntersection(o *intersection, indent int) {
 }
 
 func Dump(o interface{}, indent int) {
-	fmt.Printf("%*stype [%v]\n", indent, "", reflect.TypeOf(o));
-	switch (o.(type)) {
+	fmt.Printf("%*stype [%v]\n", indent, "", reflect.TypeOf(o))
+	switch o.(type) {
 	case *union:
-		dumpUnion(o.(*union), indent + 1)
+		dumpUnion(o.(*union), indent+1)
 	case *intersection:
-		dumpIntersection(o.(*intersection), indent + 1)
+		dumpIntersection(o.(*intersection), indent+1)
 	case *limit:
-		Dump(o.(*limit).next, indent + 1)
+		Dump(o.(*limit).next, indent+1)
 	case *offset:
-		Dump(o.(*offset).next, indent + 1)
+		Dump(o.(*offset).next, indent+1)
 	}
 }

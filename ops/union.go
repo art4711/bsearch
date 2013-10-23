@@ -11,13 +11,13 @@ func NewUnion(n ...QueryOp) QueryContainer {
 	var un union
 
 	heap.Init(&un)
-	
+
 	un.Add(n...)
 	return &un
 }
 
 func (un *union) Add(nodes ...QueryOp) {
-	for _, n := range(nodes) {
+	for _, n := range nodes {
 		heap.Push(un, n)
 	}
 }
@@ -75,7 +75,7 @@ func (un union) Len() int {
 func (un union) Less(i, j int) bool {
 	a := un[i].CurrentDoc()
 	b := un[j].CurrentDoc()
-	return a.Cmp(b) > 0		// we want a max-heap
+	return a.Cmp(b) > 0 // we want a max-heap
 }
 
 // Swap to elements in the union.
@@ -94,7 +94,7 @@ func (un *union) Push(x interface{}) {
 // Needed to implement heap.Interface.
 func (un *union) Pop() interface{} {
 	l := len(*un)
-	r := (*un)[l - 1]
+	r := (*un)[l-1]
 	*un = (*un)[:l-1]
 	return r
 }
@@ -103,7 +103,7 @@ func (un *union) Pop() interface{} {
 func (un union) peek() QueryOp {
 	l := len(un)
 	if l > 0 {
-		return un[l - 1]
+		return un[l-1]
 	}
-	return nil	
+	return nil
 }

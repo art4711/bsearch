@@ -5,10 +5,10 @@ import (
 )
 
 type Index struct {
-	br    *blob_reader
-	Docs  map[uint32][]byte
-	Attrs map[string][]IbDoc
-	Meta bconf.Bconf
+	br     *blob_reader
+	Docs   map[uint32][]byte
+	Attrs  map[string][]IbDoc
+	Meta   bconf.Bconf
 	header string
 }
 
@@ -33,7 +33,7 @@ func Open(name string) (*Index, error) {
 
 	in.Meta.LoadJson(in.br.get_meta())
 
-	in.Header()	// Pre-cache the header to avoid race conditions.
+	in.Header() // Pre-cache the header to avoid race conditions.
 
 	return &in, nil
 }

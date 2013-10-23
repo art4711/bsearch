@@ -1,16 +1,16 @@
 package index
 
 import (
-	"os"
-	"unsafe"
 	"github.com/art4711/filemap"
 	"log"
+	"os"
+	"unsafe"
 )
 
 type blob_reader struct {
-	file      *os.File
-	fmap	  *filemap.Map
-	Hdr       *IbHeader
+	file *os.File
+	fmap *filemap.Map
+	Hdr  *IbHeader
 }
 
 func open_blob_reader(name string) (*blob_reader, error) {
@@ -48,7 +48,7 @@ func (br *blob_reader) reslice(len uintptr, off, sz uint64, sz_in_bytes bool) un
 	r, err := br.fmap.Slice(len, off, sz)
 	if err != nil {
 		log.Fatal("filemap.Slice: %v", err)
-	} 
+	}
 	return r
 }
 
@@ -57,7 +57,7 @@ func (br *blob_reader) get_documents() []IbDocument {
 }
 
 func (br *blob_reader) get_document_data(d *IbDocument) []byte {
-	r, err := br.fmap.Bytes(d.Blob_offs, uint64(d.Doclen) - 1)
+	r, err := br.fmap.Bytes(d.Blob_offs, uint64(d.Doclen)-1)
 	if err != nil {
 		log.Fatal("get_document_data: %v", err)
 	}
