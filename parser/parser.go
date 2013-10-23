@@ -9,25 +9,23 @@ import (
 
 type Query struct {
 	Stack []ops.QueryContainer
-	Offset uint32
-	Limit uint32
 	in *index.Index
 }
 
-func (q *Query) SetLimit(l string) {
+func (q *Query) Limit(l string) {
 	li, err := strconv.ParseInt(l, 10, 32)
 	if err != nil {
 		log.Fatal("limit parse failed")
 	}
-	q.Limit = uint32(li)
+	q.push(ops.NewLimit(uint(li)))
 }
 
-func (q *Query) SetOffset(o string) {
+func (q *Query) Offset(o string) {
 	oi, err := strconv.ParseInt(o, 10, 32)
 	if err != nil {
 		log.Fatal("limit parse failed")
 	}
-	q.Offset = uint32(oi)
+	q.push(ops.NewOffset(uint(oi)))
 }
 
 func (q *Query) StartIntersection() {
@@ -38,7 +36,7 @@ func (q *Query) StartUnion() {
 	q.push(ops.NewUnion())
 }
 
-func (q *Query) EndUnion() {
+func (q *Query) PopAdd() {
 	q.add(q.pop())
 }
 

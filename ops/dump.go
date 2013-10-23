@@ -24,5 +24,9 @@ func Dump(o interface{}, indent int) {
 		dumpUnion(o.(*union), indent + 1)
 	case *intersection:
 		dumpIntersection(o.(*intersection), indent + 1)
+	case *limit:
+		Dump(o.(*limit).next, indent + 1)
+	case *offset:
+		Dump(o.(*offset).next, indent + 1)
 	}
 }
