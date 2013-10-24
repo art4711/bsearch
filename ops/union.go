@@ -93,7 +93,7 @@ func (un *union) Pop() interface{} {
 func (un union) peek() QueryOp {
 	l := len(un)
 	if l > 0 {
-		return un[l-1]
+		return un[0]
 	}
 	return nil
 }
