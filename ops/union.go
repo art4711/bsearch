@@ -18,7 +18,9 @@ func NewUnion(n ...QueryOp) QueryContainer {
 
 func (un *union) Add(nodes ...QueryOp) {
 	for _, n := range nodes {
-		heap.Push(un, n)
+		if n.CurrentDoc() != nil { 
+			heap.Push(un, n)
+		}
 	}
 }
 
