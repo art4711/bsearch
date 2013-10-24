@@ -50,8 +50,6 @@ func bltest(in *index.Index) {
 	p := parser.Parse(in, "0 count_all(hej) region:11 category:1000 OR category:2000")
 	q := p.Stack[0]
 
-	ops.Dump(q, 0)
-
 	d := index.NullDoc()
 	for true {
 		d = q.NextDoc(d)
@@ -81,7 +79,9 @@ func main() {
 	defer in.Close()
 
 	t1 := time.Now()
-	bltest(in)
+	for i := 0; i < 10; i++ {
+		bltest(in)
+	}
 	t2 := time.Now()
 	fmt.Printf("t: %v\n", t2.Sub(t1))
 }
