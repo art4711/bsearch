@@ -21,7 +21,7 @@ func (o *offset) Add(n ...QueryOp) {
 	o.next = n[0]
 }
 
-func (o *offset) CurrentDoc() *index.IbDoc {
+func (o offset) CurrentDoc() *index.IbDoc {
 	d := o.next.CurrentDoc()
 	if o.offset == 0 {
 		return d

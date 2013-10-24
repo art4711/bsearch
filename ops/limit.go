@@ -21,7 +21,7 @@ func (l *limit) Add(n ...QueryOp) {
 	l.next = n[0]
 }
 
-func (l *limit) CurrentDoc() *index.IbDoc {
+func (l limit) CurrentDoc() *index.IbDoc {
 	if l.lim == 0 {
 		return nil
 	}

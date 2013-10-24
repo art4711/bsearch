@@ -23,7 +23,7 @@ func (ca *count_all) Add(n ...QueryOp) {
 	ca.next = n[0]
 }
 
-func (ca *count_all) CurrentDoc() *index.IbDoc {
+func (ca count_all) CurrentDoc() *index.IbDoc {
 	return ca.next.CurrentDoc()
 }
 
