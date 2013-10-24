@@ -34,11 +34,11 @@ Attr <-  AttrUnion / Attribute
 
 Attribute <- < attr_name ':' attr_value > { p.Attr(buffer[begin:end]) }
 AttrUnion <- { p.StartUnion() } AttributeORList { p.PopAdd() }
-AttributeORList <- Attribute s 'OR' s Attribute
+AttributeORList <- Attribute (s 'OR' s Attribute)+
 
 number <- [0-9]+
 s <- ' '+
 counter_name <- generic_name
 attr_name <- generic_name
 attr_value <- generic_name
-generic_name <- [a-z0-9]+
+generic_name <- [a-z0-9_]+
