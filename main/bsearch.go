@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 )
 
 func usage() {
@@ -46,7 +47,7 @@ func stdtest(in *index.Index) {
 }
 
 func bltest(in *index.Index) {
-	p := parser.Parse(in, "0 count_all(hej) region:11 category:1000 OR category:2000 OR category:3000")
+	p := parser.Parse(in, "0 count_all(hej) region:11 category:1000 OR category:2000")
 	q := p.Stack[0]
 
 	ops.Dump(q, 0)
@@ -79,5 +80,8 @@ func main() {
 	}
 	defer in.Close()
 
+	t1 := time.Now()
 	bltest(in)
+	t2 := time.Now()
+	fmt.Printf("t: %v\n", t2.Sub(t1))
 }
