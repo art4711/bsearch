@@ -41,7 +41,7 @@ func main() {
 
 	fmt.Printf("%v\n", in.Header())
 
-	var d *index.IbDoc
+	d := index.NullDoc()
 	for true {
 		d = q.NextDoc(d)
 		if d == nil {

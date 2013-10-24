@@ -56,6 +56,11 @@ func (a *IbDoc) Inc() *IbDoc {
 	return &r
 }
 
+// Returns a document higher than all possible documents in the index.
+func NullDoc() *IbDoc {
+	return &IbDoc{Id: ^uint32(0), Order: ^uint32(0)}
+}
+
 // IbDocument is the element of the documents array.
 // Doc - document id.
 // Doclen - length of the string representing the document in the blob.

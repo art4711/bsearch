@@ -31,19 +31,7 @@ func (un *union) CurrentDoc() *index.IbDoc {
 }
 
 func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
-	/*
-	 * XXX - it doesn't seem to be easy to implement that search == nil always
-	 * returns the next document without also removing the ability for
-	 * CurrentDoc to be easily implementable. Choose one and change the
-	 * documentation of the interface.
-	 */
 	d := un.CurrentDoc()
-	if search == nil {
-		// XXX - maybe search = d?
-		// But then we'll never return the first document when always called
-		// with nil.
-		return d
-	}
 	// Chew up all documents bigger than search
 	for d != nil && search.Cmp(d) < 0 {
 		/*

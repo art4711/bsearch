@@ -21,10 +21,6 @@ func (ba attr) CurrentDoc() *index.IbDoc {
 }
 
 func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
-	if search == nil {
-		return ba.CurrentDoc()
-	}
-
 	l := len(*ba)
 	i := sort.Search(l, func(i int) bool {
 		d := (*ba)[i]

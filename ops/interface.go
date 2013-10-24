@@ -19,9 +19,6 @@ type QueryOp interface {
 	CurrentDoc() *index.IbDoc
 
 	// NextDoc returns the document equal to `search` or next higher.
-	// If called with nil it will return the document after the last
-	// returned document or the first document if no document has been
-	// returned yet.
 	NextDoc(search *index.IbDoc) *index.IbDoc
 
 	// Recursively adds any headers this might need to return.
