@@ -36,17 +36,10 @@ func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
 	d := un.CurrentDoc()
 	// Chew up all documents bigger than search
 	for d != nil && search.Cmp(d) < 0 {
-		/*
-		 * We could use a heap.UpdateHead here to avoid all those expensive
-		 * Pop/Push. It is trivially implemented with heap.down(h, 0, h.Len()),
-		 * but unfortunately that's not exposed to us. Another alternative is
-		 * heap.Init, but that's too brutal too.
-		 */
-		n := heap.Pop(un).(QueryOp)
-
-		/* Only put the element back into the heap if it's not empty. */
-		if n.NextDoc(search) != nil {
-			heap.Push(un, n)
+		if un.peek().NextDoc(search) != nil {
+			heap.Fix(un, 0)
+		} else {
+			heap.Pop(un)
 		}
 		d = un.CurrentDoc()
 	}
