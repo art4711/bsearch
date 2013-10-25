@@ -26,8 +26,7 @@ func (o offset) CurrentDoc() *index.IbDoc {
 	if o.offset == 0 {
 		return d
 	}
-	var s index.IbDoc
-	s = *d
+	s := *d
 	for ; o.offset > 0; o.offset-- {
 		s.Inc()
 		d := o.next.NextDoc(&s)

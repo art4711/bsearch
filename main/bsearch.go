@@ -32,14 +32,15 @@ func stdtest(in *index.Index) {
 
 	fmt.Printf("%v\n", in.Header())
 
-	d := index.NullDoc()
+	s := index.NullDoc()
 	for true {
-		d = q.NextDoc(d)
+		d := q.NextDoc(s)
 		if d == nil {
 			break
 		}
 		fmt.Printf("%v\n", string(in.Docs[d.Id]))
-		d = d.Inc()
+		*s = *d
+		s.Inc()
 	}
 	h := make(headers)
 	q.ProcessHeaders(h)
@@ -53,13 +54,14 @@ func bltest(in *index.Index) {
 	q := p.Stack[0]
 
 	t1 := time.Now()
-	d := index.NullDoc()
+	s := index.NullDoc()
 	for true {
-		d = q.NextDoc(d)
+		d := q.NextDoc(s)
 		if d == nil {
 			break
 		}
-		d = d.Inc()
+		*s = *d
+		s.Inc()
 	}
 	h := make(headers)
 	q.ProcessHeaders(h)

@@ -50,10 +50,8 @@ func (a *IbDoc) Cmp(b *IbDoc) int {
 	return 0
 }
 
-func (a *IbDoc) Inc() *IbDoc {
-	r := *a
-	r.Id--
-	return &r
+func (a *IbDoc) Inc() {
+	a.Id--
 }
 
 // Returns a document higher than all possible documents in the index.
