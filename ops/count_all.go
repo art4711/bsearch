@@ -1,15 +1,15 @@
 package ops
 
 import (
-	"log"
 	"bsearch/index"
 	"fmt"
+	"log"
 )
 
 type count_all struct {
 	count uint
-	next QueryOp
-	name string
+	next  QueryOp
+	name  string
 }
 
 func CountAll(name string) QueryContainer {

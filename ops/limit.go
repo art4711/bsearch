@@ -36,7 +36,6 @@ func (l *limit) NextDoc(s *index.IbDoc) *index.IbDoc {
 	return l.next.NextDoc(s)
 }
 
-
 func (l limit) ProcessHeaders(hc HeaderCollector) {
 	l.next.ProcessHeaders(hc)
 }

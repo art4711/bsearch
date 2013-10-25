@@ -43,7 +43,7 @@ func stdtest(in *index.Index) {
 	q.ProcessHeaders(h)
 	for k, v := range h {
 		fmt.Printf("info:%v:%v\n", k, v)
-	} 
+	}
 }
 
 func bltest(in *index.Index) {
@@ -62,7 +62,7 @@ func bltest(in *index.Index) {
 	q.ProcessHeaders(h)
 	for k, v := range h {
 		fmt.Printf("info:%v:%v\n", k, v)
-	}	
+	}
 }
 
 func main() {

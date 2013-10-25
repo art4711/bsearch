@@ -79,4 +79,3 @@ func Parse(i *index.Index, s string) Query {
 	q.Execute()
 	return q.Query
 }
-
