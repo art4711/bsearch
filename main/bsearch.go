@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 	"log"
+ 	"runtime/pprof"
 )
 
 func usage() {
@@ -69,6 +70,8 @@ func bltest(in *index.Index) {
 	}
 }
 
+var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to file")
+ 
 func main() {
 	flag.Parse()
 	if flag.NArg() != 1 {
@@ -80,6 +83,16 @@ func main() {
 		log.Fatal(os.Stderr, "bindex.Open: %v\n", err)
 	}
 	defer in.Close()
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 
 	t1 := time.Now()
 	for i := 0; i < 10; i++ {
