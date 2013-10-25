@@ -41,7 +41,7 @@ func (it intersection) NextDoc(search *index.IbDoc) *index.IbDoc {
 			if d == nil {
 				return nil
 			}
-			if search.Cmp(d) != 0 {
+			if !search.Equal(d) {
 				search = d
 				start_node = i
 			}
