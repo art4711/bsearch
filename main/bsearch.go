@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"log"
 )
 
 func usage() {
@@ -50,6 +51,7 @@ func bltest(in *index.Index) {
 	p := parser.Parse(in, "0 count_all(hej) region:11 category:1000 OR category:2000")
 	q := p.Stack[0]
 
+	t1 := time.Now()
 	d := index.NullDoc()
 	for true {
 		d = q.NextDoc(d)
@@ -60,6 +62,8 @@ func bltest(in *index.Index) {
 	}
 	h := make(headers)
 	q.ProcessHeaders(h)
+	t2 := time.Now()
+	fmt.Printf("rt: %v\n", t2.Sub(t1))
 	for k, v := range h {
 		fmt.Printf("info:%v:%v\n", k, v)
 	}
@@ -73,8 +77,7 @@ func main() {
 	dbname := flag.Arg(0)
 	in, err := index.Open(dbname)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "bindex.Open: %v\n", err)
-		return
+		log.Fatal(os.Stderr, "bindex.Open: %v\n", err)
 	}
 	defer in.Close()
 
