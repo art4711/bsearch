@@ -50,10 +50,10 @@ func stdtest(in *index.Index) {
 }
 
 func bltest(in *index.Index) {
-	p := parser.Parse(in, "0 count_all(hej) region:11 category:1000 OR category:2000")
+	p := parser.Parse(in, "0 count_all(hej) status:active region:11 category:1000 OR category:2000")
 	q := p.Stack[0]
 
-	t1 := time.Now()
+//	t1 := time.Now()
 	s := index.NullDoc()
 	for true {
 		d := q.NextDoc(s)
@@ -65,11 +65,8 @@ func bltest(in *index.Index) {
 	}
 	h := make(headers)
 	q.ProcessHeaders(h)
-	t2 := time.Now()
-	fmt.Printf("rt: %v\n", t2.Sub(t1))
-	for k, v := range h {
-		fmt.Printf("info:%v:%v\n", k, v)
-	}
+//	t2 := time.Now()
+//	fmt.Printf("rt: %v\n", t2.Sub(t1))
 }
 
 var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to file")
@@ -96,6 +93,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	bltest(in)	// Warm up.
 	t1 := time.Now()
 	for i := 0; i < 10; i++ {
 		bltest(in)
