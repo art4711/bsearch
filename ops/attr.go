@@ -2,6 +2,7 @@ package ops
 
 import (
 	"bsearch/index"
+//	"sort"
 )
 
 type attr []index.IbDoc
@@ -20,20 +21,44 @@ func (ba attr) CurrentDoc() *index.IbDoc {
 }
 
 func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
+	/*
+	 * We know that quite often the doc we're looking for is quite often early in the attribute.
+	 * We abuse that knowledge to make a linear scan of the first few elements of the doc array
+	 * to see if we can catch it.
+	 *
+	 * The constant of 5 was determined experimentally to be good enough without risking too much
+	 * in the pessimal case (it's also related to a cache line size). In an optimal world we should
+	 * probably try to determine it run-time.
+	 *
+	 * We also bias the binary search to the left, potentially degenerating into a linear search on
+	 * small attributes, but the experimental number 16 gives the best performance on test data.
+	 */
+
+	const firstLinear = 5
+	const leftBias = 16
+
 	l := len(*ba)
 
+	start := 0
+	for start = 0; start < l && start < firstLinear; start++ {
+		if (*ba)[start].LessEqual(*search) {
+			(*ba) = (*ba)[start:]
+			return &(*ba)[0]
+		}
+	}
+	
 /*
 	i := sort.Search(l, func(i int) bool {
 		d := (*ba)[i]
-		return search.Order > d.Order || (search.Order == d.Order && search.Id >= d.Id)
+		return d.LessEqual(*search)
 	})
- The code below is an expanded version of this call. Inlining gives us a 30% speedup.
+ The code below is an expanded version of this call. Inlining gives us a large speedup and allows us to cheat.
 */
-	i, j := 0, l
+	i, j := start, l
 	for i < j {
-		h := i + (j - i)/2
+		h := i + (j - i)/leftBias
 		d := (*ba)[h]
-		if (search.Order > d.Order || (search.Order == d.Order && search.Id >= d.Id)) {
+		if d.LessEqual(*search) {
 			j = h
 		} else {
 			i = h + 1
