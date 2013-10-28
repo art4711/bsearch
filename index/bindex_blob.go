@@ -34,12 +34,16 @@ type IbDoc struct {
 	Suborder uint32
 }
 
-func (a IbDoc) Equal(b *IbDoc) bool {
+func (a IbDoc) Equal(b IbDoc) bool {
 	return a.Order == b.Order && a.Id == b.Id
 }
 
-func (a IbDoc) Less(b *IbDoc) bool {
+func (a IbDoc) Less(b IbDoc) bool {
 	return a.Order < b.Order || (a.Order == b.Order && a.Id < b.Id)
+}
+
+func (a IbDoc) LessEqual(b IbDoc) bool {
+	return a.Order < b.Order || (a.Order == b.Order && a.Id <= b.Id)
 }
 
 func (a *IbDoc) Inc() {

@@ -35,7 +35,7 @@ func (un union) CurrentDoc() *index.IbDoc {
 func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
 	d := un.CurrentDoc()
 	// Chew up all documents bigger than search
-	for d != nil && search.Less(d) {
+	for d != nil && search.Less(*d) {
 		if un.peek().NextDoc(search) != nil {
 			heap.Fix(un, 0)
 		} else {
@@ -58,7 +58,7 @@ func (un union) Len() int {
 func (un union) Less(i, j int) bool {
 	a := un[i].CurrentDoc()
 	b := un[j].CurrentDoc()
-	return b.Less(a) // we want a max-heap
+	return b.Less(*a) // we want a max-heap
 }
 
 // Swap to elements in the union.
