@@ -21,10 +21,7 @@ func (it *intersection) Add(n ...QueryOp) {
 }
 
 func (it intersection) CurrentDoc() *index.IbDoc {
-	if len(it) == 0 {
-		return nil
-	}
-	return (it)[0].CurrentDoc()
+	return it[0].CurrentDoc()
 }
 
 func (it intersection) NextDoc(search *index.IbDoc) *index.IbDoc {

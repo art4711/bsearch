@@ -26,9 +26,6 @@ func (un *union) Add(nodes ...QueryOp) {
 
 func (un union) CurrentDoc() *index.IbDoc {
 	h := un.peek()
-	if h == nil {
-		return nil
-	}
 	return h.CurrentDoc()
 }
 

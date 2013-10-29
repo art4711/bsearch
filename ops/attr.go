@@ -14,9 +14,6 @@ func NewAttr(in *index.Index, key string) QueryOp {
 }
 
 func (ba attr) CurrentDoc() *index.IbDoc {
-	if ba == nil {
-		return nil
-	}
 	return &ba[0]
 }
 
