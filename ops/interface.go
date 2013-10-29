@@ -13,10 +13,9 @@ type HeaderCollector interface {
 // to a sorted set of documents sorted on IbDoc.order.
 type QueryOp interface {
 
-	// CurrentDoc returns the last document returned by NextDoc
-	// or the first document from this query if NextDoc hasn't been
-	// called yet.
-	// Can't be called on invalid or exhausted QueryOp.
+	// CurrentDoc returns the last document returned by NextDoc.
+	// Can't be called on invalid or exhausted QueryOp or a QueryOp
+	// that hasn't been used with NextDoc yet.
 	CurrentDoc() *index.IbDoc
 
 	// NextDoc returns the document equal to `search` or next higher.
