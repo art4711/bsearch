@@ -19,16 +19,17 @@ func (ba attr) CurrentDoc() *index.IbDoc {
 
 func (ba *attr) NextDoc(search *index.IbDoc) *index.IbDoc {
 	/*
-	 * We know that quite often the doc we're looking for is quite often early in the attribute.
-	 * We abuse that knowledge to make a linear scan of the first few elements of the doc array
-	 * to see if we can catch it.
+	 * We know that the doc we're looking for is quite often early in the attribute.
+	 * We abuse that knowledge to make a linear scan of the first few elements of
+	 * the doc array to see if we can catch it.
 	 *
-	 * The constant of 5 was determined experimentally to be good enough without risking too much
-	 * in the pessimal case (it's also related to a cache line size). In an optimal world we should
-	 * probably try to determine it run-time.
+	 * The constant of 5 was determined experimentally to be good enough
+	 * (it's also probably related to a cache line size). In an optimal world we
+	 * should probably try to determine it run-time.
 	 *
-	 * We also bias the binary search to the left, potentially degenerating into a linear search on
-	 * small attributes, but the experimental number 16 gives the best performance on test data.
+	 * We also bias the binary search to the left, potentially degenerating into a
+	 * linear search on small attributes, but the experimental number 16 gives the
+	 * best performance on test data.
 	 */
 
 	const firstLinear = 5
