@@ -25,23 +25,42 @@ func (un *union) Add(nodes ...QueryOp) {
 }
 
 func (un union) CurrentDoc() *index.IbDoc {
-	h := un.peek()
-	return h.CurrentDoc()
+	return un[0].CurrentDoc()
 }
 
 func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
-	d := un.CurrentDoc()
+	d := (*un)[0].CurrentDoc()
 	// Chew up all documents bigger than search
 	for d != nil && search.Less(*d) {
-		if un.peek().NextDoc(search) != nil {
+		if (*un)[0].NextDoc(search) != nil {
+			// We modified the head element in the heap, fix it.
 			heap.Fix(un, 0)
 		} else {
+			// The head element was emptied, remove it.
 			heap.Pop(un)
 		}
 		d = un.CurrentDoc()
 	}
 	return d
 }
+/*
+// This is slower than version above, but doesn't use CurrentDoc (which is problematic).
+func (un *union) NextDoc(search *index.IbDoc) *index.IbDoc {
+	for len(*un) > 0 {
+		first := (*un)[0]
+		d := first.NextDoc(search)
+		if d != nil {
+			heap.Fix(un, 0)
+			if (*un)[0] == first {
+				return d
+			}
+		} else {
+			heap.Pop(un)
+		}
+	}
+	return nil
+}
+*/
 
 // Len returns the number of elements in the union.
 // Needed to implement heap.Interface.
@@ -51,7 +70,6 @@ func (un union) Len() int {
 
 // Compares two elements and returns which one is bigger than the other.
 // Needed to implement heap.Interface.
-// It's called Less because the heap is a min heap, but we want a max heap.
 func (un union) Less(i, j int) bool {
 	a := un[i].CurrentDoc()
 	b := un[j].CurrentDoc()
@@ -77,15 +95,6 @@ func (un *union) Pop() interface{} {
 	r := (*un)[l-1]
 	*un = (*un)[:l-1]
 	return r
-}
-
-// Peek at the head of the heap.
-func (un union) peek() QueryOp {
-	l := len(un)
-	if l > 0 {
-		return un[0]
-	}
-	return nil
 }
 
 func (un union) ProcessHeaders(hc HeaderCollector) {
