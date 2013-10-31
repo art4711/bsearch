@@ -42,3 +42,12 @@ multiple index versions).
  - github.com/art4711/filemap - improved implementation of mmap for go.
    necessary to handle indexes bigger than 2GB.
  - github.com/art4711/bconf - bconf
+
+## Issues and TODO ##
+ - attribute ranges and syntax for it
+ - split parsing and building of the query
+ - implement counters
+ - implement randomization
+ - word searches with all the text handling and hunspell and releated stuff
+ - phrase handling
+ - proper keepalive handling
