@@ -9,6 +9,7 @@ import (
 	"log"
  	"runtime/pprof"
 	"net"
+	"time"
 )
 
 func usage() {
@@ -70,6 +71,7 @@ func handle(conn net.Conn, in *index.Index) {
 	}
 	bq := b[:n]
 	log.Printf("query: %v\n", string(bq))
+	t1 := time.Now()
 	p := parser.Parse(in, string(bq))
 	q := p.Stack[0]
 
@@ -87,12 +89,15 @@ func handle(conn net.Conn, in *index.Index) {
 	}
 	h := make(headers)
 	q.ProcessHeaders(h)
+	t2 := time.Now()
+
+	log.Printf("Query time: %v\n", t2.Sub(t1))
+
 	for k, v := range h {
 		conn.Write([]byte(fmt.Sprintf("info:%v:%v\n", k, v)))
 	}
 	conn.Write([]byte(in.Header()))
 	conn.Write([]byte("\n"))
-	log.Printf("len: %v", len(docarr))
 	for o, d := range docarr {
 		if d == nil {
 			log.Fatalf("nil in docarr at %v", o)
