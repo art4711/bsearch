@@ -112,4 +112,5 @@ func handle(conn net.Conn, in *index.Index) {
 		conn.Write(doc)
 		conn.Write([]byte("\n"))
 	}
+	conn.Close()
 }
