@@ -8,7 +8,7 @@ others by implementing an indexer, smarter query protocol and more.
 Search engine mostly compatible with what we're using you know where
 and supports reading indexes from between platform version 2.3 and 2.5
 (indexes will change in 2.6.0 and will require code here to handle
-multiple index version).
+multiple index versions).
 
 ## Get something running ##
  - go get github.com/pointlander/peg
@@ -41,4 +41,4 @@ multiple index version).
 ## External dependencies ##
  - github.com/art4711/filemap - improved implementation of mmap for go.
    necessary to handle indexes bigger than 2GB.
- - github.com/art4711/bconf - 
+ - github.com/art4711/bconf - bconf
