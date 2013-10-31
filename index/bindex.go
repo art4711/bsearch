@@ -4,7 +4,7 @@
 package index
 
 import (
-	"bconf"
+	"github.com/art4711/bconf"
 )
 
 type Index struct {
