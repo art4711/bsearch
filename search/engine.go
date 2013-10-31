@@ -13,10 +13,11 @@ import (
  	"runtime/pprof"
 	"net"
 	"time"
+	"github.com/art4711/bconf"
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: bsearch <path to index blob>\n")
+	fmt.Fprintf(os.Stderr, "usage: bsearch <path to config>\n")
 	flag.PrintDefaults()
 	os.Exit(1)
 }
@@ -27,20 +28,23 @@ func (h headers) Add(k, v string) {
 	h[k] = v
 }
 
+type engineState struct {
+	conf bconf.Bconf
+	index *index.Index
+}
+
 var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to file")
-var listenport = flag.String("listen", "", "TCP port to listen to")
  
 func main() {
 	flag.Parse()
-	if flag.NArg() != 1 || listenport == nil {
+	if flag.NArg() != 1 {
 		usage()
 	}
-	dbname := flag.Arg(0)
-	in, err := index.Open(dbname)
-	if err != nil {
-		log.Fatal(os.Stderr, "bindex.Open: %v\n", err)
-	}
-	defer in.Close()
+
+	s := engineState{}
+
+	s.conf = make(bconf.Bconf)
+	s.conf.LoadConfFile(flag.Arg(0))
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -52,7 +56,17 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	ln, err := net.Listen("tcp", *listenport)
+	dbname := s.conf.GetString("db_name")
+	in, err := index.Open(dbname)
+	if err != nil {
+		log.Fatal(os.Stderr, "bindex.Open: %v\n", err)
+	}
+	defer in.Close()
+	s.index = in
+
+	listenport := s.conf.GetString("port", "search")
+
+	ln, err := net.Listen("tcp", ":" + listenport)
 	if err != nil {
 		log.Fatal("listen: %v\n", err)
 	}
@@ -62,11 +76,11 @@ func main() {
 		if err != nil {
 			log.Fatal("accept %v\n", err)
 		}
-		go handle(conn, in)
+		go s.handle(conn)
 	}
 }
 
-func handle(conn net.Conn, in *index.Index) {
+func (s engineState) handle(conn net.Conn) {
 	b := [2048]byte{}
 	n, err := conn.Read(b[:])
 	if err != nil {
@@ -75,20 +89,20 @@ func handle(conn net.Conn, in *index.Index) {
 	bq := b[:n]
 	log.Printf("query: %v\n", string(bq))
 	t1 := time.Now()
-	p := parser.Parse(in, string(bq))
+	p := parser.Parse(s.index, string(bq))
 	q := p.Stack[0]
 
 	docarr := make([]*index.IbDoc, 0)
 
-	s := index.NullDoc()
+	search := index.NullDoc()
 	for true {
-		d := q.NextDoc(s)
+		d := q.NextDoc(search)
 		if d == nil {
 			break
 		}
 		docarr = append(docarr, d)
-		*s = *d
-		s.Inc()
+		*search = *d
+		search.Inc()
 	}
 	h := make(headers)
 	q.ProcessHeaders(h)
@@ -99,13 +113,13 @@ func handle(conn net.Conn, in *index.Index) {
 	for k, v := range h {
 		conn.Write([]byte(fmt.Sprintf("info:%v:%v\n", k, v)))
 	}
-	conn.Write([]byte(in.Header()))
+	conn.Write([]byte(s.index.Header()))
 	conn.Write([]byte("\n"))
 	for o, d := range docarr {
 		if d == nil {
 			log.Fatalf("nil in docarr at %v", o)
 		}
-		doc, exists := in.Docs[d.Id]
+		doc, exists := s.index.Docs[d.Id]
 		if !exists {
 			log.Printf("Doc %v does not exist", d.Id)
 		}
