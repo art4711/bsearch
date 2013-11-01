@@ -15,6 +15,7 @@ import (
 	"time"
 	"github.com/art4711/bconf"
 	"github.com/art4711/timers"
+	"bufio"
 )
 
 func usage() {
@@ -71,14 +72,25 @@ func main() {
 	defer in.Close()
 	s.index = in
 
+	cchan := make(chan string)
+
+	go s.control(cchan)
+	go s.listener()
+	for {
+		con := <- cchan
+		if con == "stop" {
+			break;
+		}
+	}
+}
+
+func (s engineState) listener() {
 	listenport := s.conf.GetString("port", "search")
 
 	ln, err := net.Listen("tcp", ":" + listenport)
 	if err != nil {
 		log.Fatal("listen: %v\n", err)
 	}
-
-	go s.control()
 
 	for {
 		conn, err := ln.Accept()
@@ -143,13 +155,20 @@ func (s engineState) handle(conn net.Conn) {
 	pt.Stop()
 }
 
-func (s engineState) control() {
-	for true {
-		d, _ := time.ParseDuration("10s")
-		select {
-		case <- time.After(d):
+func (s engineState) control(cchan chan string) {
+	commandport := s.conf.GetString("port", "command")
+
+	ln, err := net.Listen("tcp", ":" + commandport)
+	if err != nil {
+		log.Fatal("listen: %v\n", err)
+	}
+
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			log.Fatal("accept %v\n", err)
 		}
-		log.Printf("dumping timers")
+		w := bufio.NewWriter(conn)
 		s.timer.Foreach(func (name []string, tot, avg, max, min time.Duration, cnt int) {
 			var n string
 			for k, v := range name {
@@ -159,11 +178,13 @@ func (s engineState) control() {
 					n = v
 				}
 			}
-			log.Printf("%v.cnt: %v\n", n, cnt)
-			log.Printf("%v.tot: %v\n", n, tot)
-			log.Printf("%v.min: %v\n", n, min)
-			log.Printf("%v.avg: %v\n", n, avg)
-			log.Printf("%v.max: %v\n", n, max)
+			fmt.Fprintf(w, "%v.cnt: %v\n", n, cnt)
+			fmt.Fprintf(w, "%v.tot: %v\n", n, tot)
+			fmt.Fprintf(w, "%v.min: %v\n", n, min)
+			fmt.Fprintf(w, "%v.avg: %v\n", n, avg)
+			fmt.Fprintf(w, "%v.max: %v\n", n, max)
 		})
+		w.Flush()
+		conn.Close()
 	}
 }
