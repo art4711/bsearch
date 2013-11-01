@@ -49,6 +49,7 @@ func (in Index) Header() string {
 			}
 			in.header += v
 		})
+		in.header += "\n"
 	}
 	return in.header
 }

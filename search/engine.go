@@ -102,6 +102,7 @@ func (s engineState) listener() {
 }
 
 func (s engineState) handle(conn net.Conn) {
+	defer conn.Close()
 	qt := s.timer.Start("query")
 	defer qt.Stop()
 
@@ -112,6 +113,9 @@ func (s engineState) handle(conn net.Conn) {
 	}
 	bq := b[:n]
 
+	writer := bufio.NewWriter(conn)
+	defer writer.Flush()
+
 	pt := qt.Start("parse")
 	p := parser.Parse(s.index, string(bq))
 	q := p.Stack[0]
@@ -120,7 +124,7 @@ func (s engineState) handle(conn net.Conn) {
 
 	pt = pt.Handover("performQuery")
 	search := index.NullDoc()
-	for true {
+	for {
 		d := q.NextDoc(search)
 		if d == nil {
 			break
@@ -135,10 +139,9 @@ func (s engineState) handle(conn net.Conn) {
 
 	pt = pt.Handover("writeHeaders")
 	for k, v := range h {
-		conn.Write([]byte(fmt.Sprintf("info:%v:%v\n", k, v)))
+		fmt.Fprintf(writer, "info:%v:%v\n", k, v)
 	}
-	conn.Write([]byte(s.index.Header()))
-	conn.Write([]byte("\n"))
+	writer.WriteString(s.index.Header())
 	pt = pt.Handover("writeDocs")
 	for o, d := range docarr {
 		if d == nil {
@@ -148,10 +151,9 @@ func (s engineState) handle(conn net.Conn) {
 		if !exists {
 			log.Printf("Doc %v does not exist", d.Id)
 		}
-		conn.Write(doc)
-		conn.Write([]byte("\n"))
+		writer.Write(doc)
+		writer.WriteString("\n")
 	}
-	conn.Close()
 	pt.Stop()
 }
 
