@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"time"
 	"github.com/art4711/bconf"
 	"github.com/art4711/timers"
 	"bufio"
