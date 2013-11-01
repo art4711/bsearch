@@ -100,37 +100,3 @@ func (s EngineState) handle(conn net.Conn) {
 	}
 	pt.Stop()
 }
-
-func (s EngineState) Control(cchan chan string) {
-	commandport := s.Conf.GetString("port", "command")
-
-	ln, err := net.Listen("tcp", ":" + commandport)
-	if err != nil {
-		log.Fatal("listen: %v\n", err)
-	}
-
-	for {
-		conn, err := ln.Accept()
-		if err != nil {
-			log.Fatal("accept %v\n", err)
-		}
-		w := bufio.NewWriter(conn)
-		s.Timer.Foreach(func (name []string, tot, avg, max, min time.Duration, cnt int) {
-			var n string
-			for k, v := range name {
-				if k > 0 {
-					n += "." + v;
-				} else {
-					n = v
-				}
-			}
-			fmt.Fprintf(w, "%v.cnt: %v\n", n, cnt)
-			fmt.Fprintf(w, "%v.tot: %v\n", n, tot)
-			fmt.Fprintf(w, "%v.min: %v\n", n, min)
-			fmt.Fprintf(w, "%v.avg: %v\n", n, avg)
-			fmt.Fprintf(w, "%v.max: %v\n", n, max)
-		})
-		w.Flush()
-		conn.Close()
-	}
-}
