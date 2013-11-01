@@ -14,6 +14,7 @@ import (
 	"net"
 	"time"
 	"github.com/art4711/bconf"
+	"github.com/art4711/timers"
 )
 
 func usage() {
@@ -31,6 +32,8 @@ func (h headers) Add(k, v string) {
 type engineState struct {
 	conf bconf.Bconf
 	index *index.Index
+	timer *timers.Timer
+	
 }
 
 var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to file")
@@ -41,10 +44,12 @@ func main() {
 		usage()
 	}
 
-	s := engineState{}
+	s := engineState{ conf: make(bconf.Bconf) }
+	s.timer = timers.New()
 
-	s.conf = make(bconf.Bconf)
+	timerConf := s.timer.Start("loadconf")
 	s.conf.LoadConfFile(flag.Arg(0))
+	timerConf.Stop()
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -57,7 +62,9 @@ func main() {
 	}
 
 	dbname := s.conf.GetString("db_name")
+	timerIndex := s.timer.Start("indexOpen")
 	in, err := index.Open(dbname)
+	timerIndex.Stop()
 	if err != nil {
 		log.Fatal(os.Stderr, "bindex.Open: %v\n", err)
 	}
@@ -71,6 +78,8 @@ func main() {
 		log.Fatal("listen: %v\n", err)
 	}
 
+	go s.control()
+
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -81,19 +90,23 @@ func main() {
 }
 
 func (s engineState) handle(conn net.Conn) {
+	qt := s.timer.Start("query")
+	defer qt.Stop()
+
 	b := [2048]byte{}
 	n, err := conn.Read(b[:])
 	if err != nil {
 		log.Fatal("conn.Read %v\n", err)
 	}
 	bq := b[:n]
-	log.Printf("query: %v\n", string(bq))
-	t1 := time.Now()
+
+	pt := qt.Start("parse")
 	p := parser.Parse(s.index, string(bq))
 	q := p.Stack[0]
 
 	docarr := make([]*index.IbDoc, 0)
 
+	pt = pt.Handover("performQuery")
 	search := index.NullDoc()
 	for true {
 		d := q.NextDoc(search)
@@ -104,17 +117,17 @@ func (s engineState) handle(conn net.Conn) {
 		*search = *d
 		search.Inc()
 	}
+	pt = pt.Handover("ProcessHeaders")
 	h := make(headers)
 	q.ProcessHeaders(h)
-	t2 := time.Now()
 
-	log.Printf("Query time: %v\n", t2.Sub(t1))
-
+	pt = pt.Handover("writeHeaders")
 	for k, v := range h {
 		conn.Write([]byte(fmt.Sprintf("info:%v:%v\n", k, v)))
 	}
 	conn.Write([]byte(s.index.Header()))
 	conn.Write([]byte("\n"))
+	pt = pt.Handover("writeDocs")
 	for o, d := range docarr {
 		if d == nil {
 			log.Fatalf("nil in docarr at %v", o)
@@ -127,4 +140,30 @@ func (s engineState) handle(conn net.Conn) {
 		conn.Write([]byte("\n"))
 	}
 	conn.Close()
+	pt.Stop()
+}
+
+func (s engineState) control() {
+	for true {
+		d, _ := time.ParseDuration("10s")
+		select {
+		case <- time.After(d):
+		}
+		log.Printf("dumping timers")
+		s.timer.Foreach(func (name []string, tot, avg, max, min time.Duration, cnt int) {
+			var n string
+			for k, v := range name {
+				if k > 0 {
+					n += "." + v;
+				} else {
+					n = v
+				}
+			}
+			log.Printf("%v.cnt: %v\n", n, cnt)
+			log.Printf("%v.tot: %v\n", n, tot)
+			log.Printf("%v.min: %v\n", n, min)
+			log.Printf("%v.avg: %v\n", n, avg)
+			log.Printf("%v.max: %v\n", n, max)
+		})
+	}
 }
