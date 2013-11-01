@@ -58,7 +58,7 @@ func main() {
 
 	cchan := make(chan string)
 
-	go s.Control(cchan)
+	go s.ControlHTTP(cchan)
 	go s.Listener()
 	for {
 		con := <- cchan
