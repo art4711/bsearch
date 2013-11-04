@@ -6,6 +6,7 @@ package engine
 import (
 	"bsearch/index"
 	"bsearch/parser"
+	"bsearch/ops"
 	"fmt"
 	"log"
 	"net"
@@ -60,8 +61,11 @@ func (s EngineState) handle(conn net.Conn) {
 	defer writer.Flush()
 
 	pt := qt.Start("parse")
-	p := parser.Parse(s.Index, string(bq))
-	q := p.Stack[0]
+	q, err := parser.Parse(s.Index, string(bq))
+	if err != nil {
+		fmt.Fprintf(writer, "info:error:%v\n", err)
+		return
+	}
 
 	docarr := make([]*index.IbDoc, 0)
 
