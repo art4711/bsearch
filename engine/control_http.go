@@ -24,7 +24,17 @@ func (s EngineState) ControlHTTP(cchan chan string) {
 func (s EngineState) handleTimers(w http.ResponseWriter, req *http.Request) {
 	data := make(map[string]interface{})
 
-	s.Timer.Foreach(func (name []string, tot, avg, max, min time.Duration, cnt int) {
+	req.ParseForm()
+	var filt string
+	if len(req.Form["filt"]) > 0 && len(req.Form["filt"][0]) > 0 {
+		filt = req.Form["filt"][0]
+	}
+	
+
+	s.Timer.Foreach(func (name []string, tot, avg, max, min time.Duration, cnt int64) {
+		if filt != "" && len(name) > 0 && name[0] != filt {
+			return
+		}
 		dp := data
 		for _, v := range name {
 			if _, exists := dp[v]; !exists {
