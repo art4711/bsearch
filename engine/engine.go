@@ -6,7 +6,6 @@ package engine
 import (
 	"bsearch/index"
 	"bsearch/parser"
-	"bsearch/ops"
 	"fmt"
 	"log"
 	"net"
