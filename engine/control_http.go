@@ -44,9 +44,9 @@ func (s EngineState) handleTimers(w http.ResponseWriter, req *http.Request) {
 		}
 		dp["cnt"] = fmt.Sprint(cnt)
 		dp["tot"] = tot.String()
-		dp["min"] = tot.String()
-		dp["avg"] = tot.String()
-		dp["max"] = tot.String()
+		dp["min"] = min.String()
+		dp["avg"] = avg.String()
+		dp["max"] = max.String()
 	})
 	json, _ := json.MarshalIndent(data, "", "    ")
 	w.Write(json)
