@@ -3,7 +3,7 @@
 # license that can be found in the LICENSE file.
 package parser
 
-type QueryParser Peg {
+type ClassicParser Peg {
 	Query
 }
 

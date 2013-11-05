@@ -35,10 +35,3 @@ func (o *op) generate(i *index.Index) (ops.QueryOp, error) {
 	return qc, nil
 }
 
-func Parse(i *index.Index, s string) (ops.QueryOp, error) {
-	o, err := ParseQuery(s)
-	if err != nil {
-		return nil, err
-	}
-	return o.generate(i)
-}

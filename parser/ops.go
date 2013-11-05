@@ -127,19 +127,3 @@ func (o op) String() string {
 	s += ")"
 	return s
 }
-
-func ParseQuery(s string) (*op, error) {
-	q := &QueryParser{Buffer: s}
-
-	q.Init()
-	if err := q.Parse(); err != nil {
-		return nil, ErrSyntax
-	}
-	q.Execute()
-
-	if q.err != nil {
-		return nil, q.err
-	}
-
-	return q.stack[0], nil
-}

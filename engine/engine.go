@@ -61,7 +61,7 @@ func (s EngineState) handle(conn net.Conn) {
 	defer writer.Flush()
 
 	et = et.Handover("parse")
-	q, err := parser.Parse(s.Index, string(bq))
+	q, err := parser.Classic(s.Index, string(bq))
 	if err != nil {
 		fmt.Fprintf(writer, "info:error:%v\n", err)
 		et.Stop()

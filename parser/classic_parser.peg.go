@@ -590,7 +590,7 @@ func (t *tokens32) Expand(index int) TokenTree {
 	return nil
 }
 
-type QueryParser struct {
+type ClassicParser struct {
 	Query
 
 	Buffer string
@@ -633,7 +633,7 @@ search:
 }
 
 type parseError struct {
-	p *QueryParser
+	p *ClassicParser
 }
 
 func (e *parseError) Error() string {
@@ -656,15 +656,15 @@ func (e *parseError) Error() string {
 	return error
 }
 
-func (p *QueryParser) PrintSyntaxTree() {
+func (p *ClassicParser) PrintSyntaxTree() {
 	p.TokenTree.PrintSyntaxTree(p.Buffer)
 }
 
-func (p *QueryParser) Highlighter() {
+func (p *ClassicParser) Highlighter() {
 	p.TokenTree.PrintSyntax()
 }
 
-func (p *QueryParser) Execute() {
+func (p *ClassicParser) Execute() {
 	buffer, begin, end := p.Buffer, 0, 0
 	for token := range p.TokenTree.Tokens() {
 		switch token.Rule {
@@ -700,7 +700,7 @@ func (p *QueryParser) Execute() {
 	}
 }
 
-func (p *QueryParser) Init() {
+func (p *ClassicParser) Init() {
 	p.buffer = []rune(p.Buffer)
 	if len(p.buffer) == 0 || p.buffer[len(p.buffer)-1] != END_SYMBOL {
 		p.buffer = append(p.buffer, END_SYMBOL)
