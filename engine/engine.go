@@ -49,6 +49,7 @@ func (s EngineState) handle(conn net.Conn) {
 	qt := s.Timer.Start("query")
 	defer qt.Stop()
 
+	et := qt.Start("read")
 	b := [2048]byte{}
 	n, err := conn.Read(b[:])
 	if err != nil {
@@ -59,16 +60,17 @@ func (s EngineState) handle(conn net.Conn) {
 	writer := bufio.NewWriter(conn)
 	defer writer.Flush()
 
-	pt := qt.Start("parse")
+	et = et.Handover("parse")
 	q, err := parser.Parse(s.Index, string(bq))
 	if err != nil {
 		fmt.Fprintf(writer, "info:error:%v\n", err)
+		et.Stop()
 		return
 	}
 
 	docarr := make([]*index.IbDoc, 0)
 
-	pt = pt.Handover("performQuery")
+	et = et.Handover("performQuery")
 	search := index.NullDoc()
 	for {
 		d := q.NextDoc(search)
@@ -79,16 +81,16 @@ func (s EngineState) handle(conn net.Conn) {
 		*search = *d
 		search.Inc()
 	}
-	pt = pt.Handover("ProcessHeaders")
+	et = et.Handover("ProcessHeaders")
 	h := make(headers)
 	q.ProcessHeaders(h)
 
-	pt = pt.Handover("writeHeaders")
+	et = et.Handover("writeHeaders")
 	for k, v := range h {
 		fmt.Fprintf(writer, "info:%v:%v\n", k, v)
 	}
 	writer.WriteString(s.Index.Header())
-	pt = pt.Handover("writeDocs")
+	et = et.Handover("writeDocs")
 	for o, d := range docarr {
 		if d == nil {
 			log.Fatalf("nil in docarr at %v", o)
@@ -100,5 +102,5 @@ func (s EngineState) handle(conn net.Conn) {
 		writer.Write(doc)
 		writer.WriteString("\n")
 	}
-	pt.Stop()
+	et.Stop()
 }
