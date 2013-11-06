@@ -1,3 +1,6 @@
+// Copyright 2013 Artur Grabowski. All rights reserved.
+// Use of this source code is governed by a ISC-style
+// license that can be found in the LICENSE file.
 package engine
 
 import (
@@ -29,7 +32,6 @@ func (s EngineState) handleTimers(w http.ResponseWriter, req *http.Request) {
 	if len(req.Form["filt"]) > 0 && len(req.Form["filt"][0]) > 0 {
 		filt = req.Form["filt"][0]
 	}
-	
 
 	s.Timer.Foreach(func (name []string, tot, avg, max, min time.Duration, cnt int64) {
 		if filt != "" && len(name) > 0 && name[0] != filt {
