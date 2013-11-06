@@ -671,30 +671,30 @@ func (p *ClassicParser) Execute() {
 		case RulePegText:
 			begin, end = int(token.begin), int(token.end)
 		case RuleAction0:
-			p.PopAdd()
+			p.pa()
 		case RuleAction1:
-			p.PopAdd()
+			p.pa()
 		case RuleAction2:
-			p.Offset(buffer[begin:end])
+			p.off(buffer[begin:end])
 		case RuleAction3:
-			p.Limit(buffer[begin:end])
+			p.lim(buffer[begin:end])
 		case RuleAction4:
-			p.PopAdd()
+			p.pa()
 		case RuleAction5:
-			p.CountAll(buffer[begin:end])
+			p.countall(buffer[begin:end])
 		case RuleAction6:
-			p.StartIntersection()
+			p.startinter()
 		case RuleAction7:
-			p.StartIntersection()
+			p.startinter()
 			fmt.Printf("one attribute\n")
 		case RuleAction8:
 			fmt.Printf("no attributes\n")
 		case RuleAction9:
-			p.Attr(buffer[begin:end])
+			p.attr(buffer[begin:end])
 		case RuleAction10:
-			p.StartUnion()
+			p.startunion()
 		case RuleAction11:
-			p.PopAdd()
+			p.pa()
 
 		}
 	}
@@ -1390,30 +1390,30 @@ func (p *ClassicParser) Init() {
 			position, tokenIndex, depth = position86, tokenIndex86, depth86
 			return false
 		},
-		/* 22 Action0 <- <{ p.PopAdd() }> */
+		/* 22 Action0 <- <{ p.pa() }> */
 		nil,
-		/* 23 Action1 <- <{ p.PopAdd() }> */
+		/* 23 Action1 <- <{ p.pa() }> */
 		nil,
 		nil,
-		/* 25 Action2 <- <{ p.Offset(buffer[begin:end]) }> */
+		/* 25 Action2 <- <{ p.off(buffer[begin:end]) }> */
 		nil,
-		/* 26 Action3 <- <{ p.Limit(buffer[begin:end]) }> */
+		/* 26 Action3 <- <{ p.lim(buffer[begin:end]) }> */
 		nil,
-		/* 27 Action4 <- <{ p.PopAdd() }> */
+		/* 27 Action4 <- <{ p.pa() }> */
 		nil,
-		/* 28 Action5 <- <{ p.CountAll(buffer[begin:end]) }> */
+		/* 28 Action5 <- <{ p.countall(buffer[begin:end]) }> */
 		nil,
-		/* 29 Action6 <- <{ p.StartIntersection() }> */
+		/* 29 Action6 <- <{ p.startinter() }> */
 		nil,
-		/* 30 Action7 <- <{ p.StartIntersection(); fmt.Printf("one attribute\n") }> */
+		/* 30 Action7 <- <{ p.startinter(); fmt.Printf("one attribute\n") }> */
 		nil,
 		/* 31 Action8 <- <{ fmt.Printf("no attributes\n") }> */
 		nil,
-		/* 32 Action9 <- <{ p.Attr(buffer[begin:end]) }> */
+		/* 32 Action9 <- <{ p.attr(buffer[begin:end]) }> */
 		nil,
-		/* 33 Action10 <- <{ p.StartUnion() }> */
+		/* 33 Action10 <- <{ p.startunion() }> */
 		nil,
-		/* 34 Action11 <- <{ p.PopAdd() }> */
+		/* 34 Action11 <- <{ p.pa() }> */
 		nil,
 	}
 	p.rules = rules

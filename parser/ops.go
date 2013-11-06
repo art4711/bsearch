@@ -42,7 +42,7 @@ var ErrSyntax = errors.New("query syntax error")
 var ErrLimitRange = errors.New("limit out of range")
 var ErrOffsetRange = errors.New("offset out of range")
 
-func (q *Query) Limit(l string) {
+func (q *Query) lim(l string) {
 	li, err := strconv.ParseInt(l, 10, 32)
 	if err != nil {
 		q.err = ErrLimitRange
@@ -50,7 +50,7 @@ func (q *Query) Limit(l string) {
 	q.push(&op{ typ: oLimit, intValue: []int64{ li } })
 }
 
-func (q *Query) Offset(o string) {
+func (q *Query) off(o string) {
 	oi, err := strconv.ParseInt(o, 10, 32)
 	if err != nil {
 		q.err = ErrOffsetRange
@@ -58,23 +58,23 @@ func (q *Query) Offset(o string) {
 	q.push(&op{ typ: oOffset, intValue: []int64{ oi } })
 }
 
-func (q *Query) StartIntersection() {
+func (q *Query) startinter() {
 	q.push(&op{ typ: oIntersection })
 }
 
-func (q *Query) StartUnion() {
+func (q *Query) startunion() {
 	q.push(&op{ typ: oUnion })
 }
 
-func (q *Query) CountAll(s string) {
+func (q *Query) countall(s string) {
 	q.push(&op{ typ: oCountAll, name: s})
 }
 
-func (q *Query) Attr(a string) {
+func (q *Query) attr(a string) {
 	q.add(&op{ typ: oAttr, name: a})		// split into name+value later.
 }
 
-func (q *Query) PopAdd() {
+func (q *Query) pa() {
 	q.add(q.pop())
 }
 
