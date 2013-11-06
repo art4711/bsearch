@@ -26,8 +26,8 @@ Intersection	<- '(intersection' { p.Inter() } (s Operation)+ ')' { p.Pa() }
 Union		<- '(union' { p.Union() } (s Operation)+ ')' { p.Pa() }
 Attr		<- '(attr' s Name ')' { p.Attr(buffer[begin:end]) }
 
-Name <- ["] <generic_name> ["]
-IntValue <- number
+Name <- '"' <generic_name> '"'
+IntValue <- '[' s <number> s ']'
 
 number <- [0-9]+
 s <- ' '+

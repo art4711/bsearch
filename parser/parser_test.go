@@ -17,8 +17,7 @@ func TestClassic(t *testing.T) {
 }
 
 func TestStructured(t *testing.T) {
-//	q := `(offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))`
-	q := `(intersection (attr "a:a"))`
+	q := `(offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))`
 	ops, err := ParseStructured(q)
 	if err != nil {
 		t.Fatal(err)
