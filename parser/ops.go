@@ -58,11 +58,11 @@ func (q *Query) off(o string) {
 	q.push(&op{ typ: oOffset, intValue: []int64{ oi } })
 }
 
-func (q *Query) startinter() {
+func (q *Query) inter() {
 	q.push(&op{ typ: oIntersection })
 }
 
-func (q *Query) startunion() {
+func (q *Query) union() {
 	q.push(&op{ typ: oUnion })
 }
 

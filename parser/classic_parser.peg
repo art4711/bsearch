@@ -29,14 +29,14 @@ CountAllAttrs <- CountAll Attrs { p.pa() } / Attrs
 
 CountAll <- 'count_all(' < counter_name > ')' s { p.countall(buffer[begin:end]) }
 
-Attrs <- { p.startinter() } (Attr s)+ Attr s? /
-	{ p.startinter(); fmt.Printf("one attribute\n") } Attr s? /
+Attrs <- { p.inter() } (Attr s)+ Attr s? /
+	{ p.inter(); fmt.Printf("one attribute\n") } Attr s? /
 	s? { fmt.Printf("no attributes\n") }
 
 Attr <-  AttrUnion / Attribute
 
 Attribute <- < attr_name ':' attr_value > { p.attr(buffer[begin:end]) }
-AttrUnion <- { p.startunion() } AttributeORList { p.pa() }
+AttrUnion <- { p.union() } AttributeORList { p.pa() }
 AttributeORList <- Attribute (s 'OR' s Attribute)+
 
 number <- [0-9]+

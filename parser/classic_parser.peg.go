@@ -683,16 +683,16 @@ func (p *ClassicParser) Execute() {
 		case RuleAction5:
 			p.countall(buffer[begin:end])
 		case RuleAction6:
-			p.startinter()
+			p.inter()
 		case RuleAction7:
-			p.startinter()
+			p.inter()
 			fmt.Printf("one attribute\n")
 		case RuleAction8:
 			fmt.Printf("no attributes\n")
 		case RuleAction9:
 			p.attr(buffer[begin:end])
 		case RuleAction10:
-			p.startunion()
+			p.union()
 		case RuleAction11:
 			p.pa()
 
@@ -1403,15 +1403,15 @@ func (p *ClassicParser) Init() {
 		nil,
 		/* 28 Action5 <- <{ p.countall(buffer[begin:end]) }> */
 		nil,
-		/* 29 Action6 <- <{ p.startinter() }> */
+		/* 29 Action6 <- <{ p.inter() }> */
 		nil,
-		/* 30 Action7 <- <{ p.startinter(); fmt.Printf("one attribute\n") }> */
+		/* 30 Action7 <- <{ p.inter(); fmt.Printf("one attribute\n") }> */
 		nil,
 		/* 31 Action8 <- <{ fmt.Printf("no attributes\n") }> */
 		nil,
 		/* 32 Action9 <- <{ p.attr(buffer[begin:end]) }> */
 		nil,
-		/* 33 Action10 <- <{ p.startunion() }> */
+		/* 33 Action10 <- <{ p.union() }> */
 		nil,
 		/* 34 Action11 <- <{ p.pa() }> */
 		nil,
