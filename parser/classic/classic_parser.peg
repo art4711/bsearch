@@ -1,10 +1,12 @@
 # Copyright 2013 Artur Grabowski. All rights reserved.
 # Use of this source code is governed by a ISC-style
 # license that can be found in the LICENSE file.
-package parser
+package classic
 
-type ClassicParser Peg {
-	Query
+import "bsearch/parser/opers"
+
+type Parser Peg {
+	opers.Query
 }
 
 # A query is "<result filters> <counters+filters+sorting> <attributes> *:* <keywords>

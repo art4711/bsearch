@@ -11,8 +11,8 @@ and supports reading indexes from between platform version 2.3 and 2.5
 multiple index versions).
 
 ## Get something running ##
- - go get github.com/pointlander/peg
- - go build github.com/pointlander/peg
+ - go get github.com/art4711/peg
+ - go build github.com/art4711/peg
  - Use the generated peg binary to build the query parser:
    $ peg -switch -inline parser/parser.peg
  - Get an index from a production or test environment. This should be

@@ -1,7 +1,7 @@
 // Copyright 2013 Artur Grabowski. All rights reserved.
 // Use of this source code is governed by a ISC-style
 // license that can be found in the LICENSE file.
-package parser
+package opers
 
 import (
 	"strconv"
@@ -19,7 +19,7 @@ const (
 	oCountAll
 )
 
-type op struct {
+type Op struct {
 	typ optype
 
 	// counter name, attribute name, etc.
@@ -28,14 +28,14 @@ type op struct {
 	// only one of the following can be set. counter attrs, attr range values, etc.
 	value []string
 	intValue []int64
-	opValue []*op
+	opValue []*Op
 
-	contents []*op
+	contents []*Op
 }
 
 type Query struct {
-	stack []*op
-	err error
+	Stack []*Op
+	Err error
 }
 
 var ErrSyntax = errors.New("query syntax error")
@@ -45,56 +45,56 @@ var ErrOffsetRange = errors.New("offset out of range")
 func (q *Query) Lim(l string) {
 	li, err := strconv.ParseInt(l, 10, 32)
 	if err != nil {
-		q.err = ErrLimitRange
+		q.Err = ErrLimitRange
 	}
-	q.push(&op{ typ: oLimit, intValue: []int64{ li } })
+	q.push(&Op{ typ: oLimit, intValue: []int64{ li } })
 }
 
 func (q *Query) Off(o string) {
 	oi, err := strconv.ParseInt(o, 10, 32)
 	if err != nil {
-		q.err = ErrOffsetRange
+		q.Err = ErrOffsetRange
 	}
-	q.push(&op{ typ: oOffset, intValue: []int64{ oi } })
+	q.push(&Op{ typ: oOffset, intValue: []int64{ oi } })
 }
 
 func (q *Query) Inter() {
-	q.push(&op{ typ: oIntersection })
+	q.push(&Op{ typ: oIntersection })
 }
 
 func (q *Query) Union() {
-	q.push(&op{ typ: oUnion })
+	q.push(&Op{ typ: oUnion })
 }
 
 func (q *Query) Countall(s string) {
-	q.push(&op{ typ: oCountAll, name: s})
+	q.push(&Op{ typ: oCountAll, name: s})
 }
 
 func (q *Query) Attr(a string) {
-	q.Add(&op{ typ: oAttr, name: a})		// split into name+value later.
+	q.Add(&Op{ typ: oAttr, name: a})		// split into name+value later.
 }
 
 func (q *Query) Pa() {
 	q.Add(q.pop())
 }
 
-func (q *Query) push(o *op) {
-	q.stack = append(q.stack, o)
+func (q *Query) push(o *Op) {
+	q.Stack = append(q.Stack, o)
 }
 
-func (q *Query) pop() *op {
-	l := len(q.stack) - 1
-	r := q.stack[l]
-	q.stack = q.stack[:l]
+func (q *Query) pop() *Op {
+	l := len(q.Stack) - 1
+	r := q.Stack[l]
+	q.Stack = q.Stack[:l]
 	return r
 }
 
-func (q *Query) Add(o *op) {
-	top := q.stack[len(q.stack)-1]
+func (q *Query) Add(o *Op) {
+	top := q.Stack[len(q.Stack)-1]
 	top.contents = append(top.contents, o)
 }
 
-func (o op) String() string {
+func (o Op) String() string {
 	var t string
 	switch o.typ {
 	case oAttr:	t = "attr"

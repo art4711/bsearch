@@ -1,14 +1,14 @@
 // Copyright 2013 Artur Grabowski. All rights reserved.
 // Use of this source code is governed by a ISC-style
 // license that can be found in the LICENSE file.
-package parser
+package opers
 
 import (
 	"bsearch/index"
 	"bsearch/ops"
 )
 
-func (o *op) Generate(i *index.Index) (ops.QueryOp, error) {
+func (o *Op) Generate(i *index.Index) (ops.QueryOp, error) {
 	var qc ops.QueryContainer
 
 	switch o.typ {

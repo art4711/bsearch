@@ -1,4 +1,4 @@
-package parser
+package classic
 
 import (
 	/*"bytes"*/
@@ -6,6 +6,7 @@ import (
 	"math"
 	"sort"
 	"strconv"
+	"bsearch/parser/opers"
 )
 
 const END_SYMBOL rune = 4
@@ -590,8 +591,8 @@ func (t *tokens32) Expand(index int) TokenTree {
 	return nil
 }
 
-type ClassicParser struct {
-	Query
+type Parser struct {
+	opers.Query
 
 	Buffer string
 	buffer []rune
@@ -633,7 +634,7 @@ search:
 }
 
 type parseError struct {
-	p *ClassicParser
+	p *Parser
 }
 
 func (e *parseError) Error() string {
@@ -656,15 +657,15 @@ func (e *parseError) Error() string {
 	return error
 }
 
-func (p *ClassicParser) PrintSyntaxTree() {
+func (p *Parser) PrintSyntaxTree() {
 	p.TokenTree.PrintSyntaxTree(p.Buffer)
 }
 
-func (p *ClassicParser) Highlighter() {
+func (p *Parser) Highlighter() {
 	p.TokenTree.PrintSyntax()
 }
 
-func (p *ClassicParser) Execute() {
+func (p *Parser) Execute() {
 	buffer, begin, end := p.Buffer, 0, 0
 	for token := range p.TokenTree.Tokens() {
 		switch token.Rule {
@@ -700,7 +701,7 @@ func (p *ClassicParser) Execute() {
 	}
 }
 
-func (p *ClassicParser) Init() {
+func (p *Parser) Init() {
 	p.buffer = []rune(p.Buffer)
 	if len(p.buffer) == 0 || p.buffer[len(p.buffer)-1] != END_SYMBOL {
 		p.buffer = append(p.buffer, END_SYMBOL)

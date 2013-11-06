@@ -6,22 +6,24 @@ package parser
 import (
 	"bsearch/index"
 	"bsearch/ops"
+	"bsearch/parser/opers"
+	"bsearch/parser/classic"
 )
 
-func ParseClassic(s string) (*op, error) {
-	q := &ClassicParser{Buffer: s}
+func ParseClassic(s string) (*opers.Op, error) {
+	q := &classic.Parser{Buffer: s}
 
 	q.Init()
 	if err := q.Parse(); err != nil {
-		return nil, ErrSyntax
+		return nil, opers.ErrSyntax
 	}
 	q.Execute()
 
-	if q.err != nil {
-		return nil, q.err
+	if q.Err != nil {
+		return nil, q.Err
 	}
 
-	return q.stack[0], nil
+	return q.Stack[0], nil
 }
 
 func Classic(i *index.Index, s string) (ops.QueryOp, error) {
