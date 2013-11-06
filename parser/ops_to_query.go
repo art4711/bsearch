@@ -8,7 +8,7 @@ import (
 	"bsearch/ops"
 )
 
-func (o *op) generate(i *index.Index) (ops.QueryOp, error) {
+func (o *op) Generate(i *index.Index) (ops.QueryOp, error) {
 	var qc ops.QueryContainer
 
 	switch o.typ {
@@ -26,7 +26,7 @@ func (o *op) generate(i *index.Index) (ops.QueryOp, error) {
 		qc = ops.CountAll(o.name)
 	}
 	for _, v := range o.contents {
-		c, err := v.generate(i)
+		c, err := v.Generate(i)
 		if err != nil {
 			return nil, err
 		}

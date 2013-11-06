@@ -8,7 +8,6 @@ import (
 	"bsearch/ops"
 )
 
-
 func ParseClassic(s string) (*op, error) {
 	q := &ClassicParser{Buffer: s}
 
@@ -30,5 +29,31 @@ func Classic(i *index.Index, s string) (ops.QueryOp, error) {
 	if err != nil {
 		return nil, err
 	}
+	return o.Generate(i)
+}
+
+/*
+func ParseStructured(s string) (*op, error) {
+	q := &structured.StructuredParser{Buffer: s}
+
+	q.Init()
+	if err := q.Parse(); err != nil {
+		return nil, ErrSyntax
+	}
+	q.Execute()
+
+	if q.err != nil {
+		return nil, q.err
+	}
+
+	return q.stack[0], nil
+}
+
+func Structured(i *index.Index, s string) (ops.QueryOp, error) {
+	o, err := ParseClassic(s)
+	if err != nil {
+		return nil, err
+	}
 	return o.generate(i)
 }
+*/

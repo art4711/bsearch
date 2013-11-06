@@ -16,27 +16,27 @@ Query <- ResFiltQuery !.
 ResFiltQuery <- OffLimQuery
 
 # A normal query may start with offset+limit.
-OffLimQuery <- Offset LimQuery { p.pa() } / LimQuery
-LimQuery <- Limit Q3 { p.pa() } / Q3
+OffLimQuery <- Offset LimQuery { p.Pa() } / LimQuery
+LimQuery <- Limit Q3 { p.Pa() } / Q3
 Q3 <- Params?
 
-Offset <- < number > s	{ p.off(buffer[begin:end]) }
-Limit <- 'lim:' < number > s { p.lim(buffer[begin:end]) }
+Offset <- < number > s	{ p.Off(buffer[begin:end]) }
+Limit <- 'lim:' < number > s { p.Lim(buffer[begin:end]) }
 
 Params <- CountAllAttrs / Attrs
 
-CountAllAttrs <- CountAll Attrs { p.pa() } / Attrs
+CountAllAttrs <- CountAll Attrs { p.Pa() } / Attrs
 
-CountAll <- 'count_all(' < counter_name > ')' s { p.countall(buffer[begin:end]) }
+CountAll <- 'count_all(' < counter_name > ')' s { p.Countall(buffer[begin:end]) }
 
-Attrs <- { p.inter() } (Attr s)+ Attr s? /
-	{ p.inter(); fmt.Printf("one attribute\n") } Attr s? /
+Attrs <- { p.Inter() } (Attr s)+ Attr s? /
+	{ p.Inter(); fmt.Printf("one attribute\n") } Attr s? /
 	s? { fmt.Printf("no attributes\n") }
 
 Attr <-  AttrUnion / Attribute
 
-Attribute <- < attr_name ':' attr_value > { p.attr(buffer[begin:end]) }
-AttrUnion <- { p.union() } AttributeORList { p.pa() }
+Attribute <- < attr_name ':' attr_value > { p.Attr(buffer[begin:end]) }
+AttrUnion <- { p.Union() } AttributeORList { p.Pa() }
 AttributeORList <- Attribute (s 'OR' s Attribute)+
 
 number <- [0-9]+
