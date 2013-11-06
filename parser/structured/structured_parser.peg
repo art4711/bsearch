@@ -1,0 +1,34 @@
+# Copyright 2013 Artur Grabowski. All rights reserved.
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file.
+package structured
+
+import "bsearch/parser/opers"
+
+type StructuredParser Peg {
+	opers.Query
+}
+
+# (offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))
+
+Query <- Operation !.
+
+# This is the general case, but we're currently doing special cases for all different opers:
+# Operation <- '(' OpType (s Name)? (s Value)* (s Operation)* ')'
+# Value <- IntValue / StrValue / OpValue
+
+Operation <- Offset / Limit / CountAll / Intersection / Union / Attr
+
+Offset		<- '(offset' s IntValue { p.Off(buffer[begin:end]) } s Operation ')' { p.Pa() }
+Limit		<- '(limit' s IntValue { p.Lim(buffer[begin:end]) } s Operation ')'  { p.Pa() }
+CountAll	<- '(count_all' s Name { p.Countall(buffer[begin:end]) } s Operation ')' { p.Pa() }
+Intersection	<- '(intersection' { p.Inter() } (s Operation)+ ')' { p.Pa() }
+Union		<- '(union' { p.Union() } (s Operation)+ ')' { p.Pa() }
+Attr		<- '(attr' s Name ')' { p.Attr(buffer[begin:end]) }
+
+Name <- ["] <generic_name> ["]
+IntValue <- number
+
+number <- [0-9]+
+s <- ' '+
+generic_name <- [a-z0-9_:]+

@@ -75,7 +75,9 @@ func (q *Query) Attr(a string) {
 }
 
 func (q *Query) Pa() {
-	q.Add(q.pop())
+	if len(q.Stack) > 1 {	// XXX - horrible workaround so that the top element doesn't pop.
+		q.Add(q.pop())
+	}
 }
 
 func (q *Query) push(o *Op) {

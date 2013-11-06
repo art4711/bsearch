@@ -15,11 +15,17 @@ func TestClassic(t *testing.T) {
 		t.Errorf("wrong result: %v", s)
 	}
 }
-/*
+
 func TestStructured(t *testing.T) {
-	s := ParseStructured(`(offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))`).String()
-	if s != `(offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))` {
+//	q := `(offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))`
+	q := `(intersection (attr "a:a"))`
+	ops, err := ParseStructured(q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := ops.String()
+	if s != q {
 		t.Errorf("wrong result: %v", s)
 	}
 }
-*/
+
