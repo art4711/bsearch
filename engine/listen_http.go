@@ -6,9 +6,9 @@ package engine
 import (
 	"bsearch/parser"
 	"fmt"
-	"log"
 	"net/http"
 	"encoding/json"
+	"log"
 )
 
 func (s EngineState) ListenHTTP() {
@@ -29,37 +29,33 @@ func (s EngineState) HandleHTTPQuery(w http.ResponseWriter, req *http.Request) {
 	defer qt.Stop()
 
 	et := qt.Start("req")
-	qv := req.FormValue("q")
+
+	result := make(map[string]interface{})
+	resultInfo := make(headers)
+
 	et.Handover("parse")
-	q, err := parser.Structured(s.Index, qv)
+	q, err := parser.Structured(s.Index, req.FormValue("q"))
 	if err != nil {
-		log.Printf("parser error [%v]: %v", qv, err)
-		w.Write([]byte("parser failed:\n"))
-		w.Write([]byte(fmt.Sprint(err)))
-		w.Write([]byte("\n"))
-		et.Stop()
-		return
+		resultInfo.Add("error", "parse error")
+		resultInfo.Add("parse_error", fmt.Sprint(err))
+	} else {
+		et.Handover("perform")
+		docarr := performQuery(q, et)
+
+		et = et.Handover("ProcessHeaders")
+		q.ProcessHeaders(resultInfo)
+
+		docsData := make(map[string]interface{})
+		for _, d := range docarr {
+			docsData[fmt.Sprint(d.Id)] = s.Index.SplitDoc(d.Id)
+		}
+		result["docs"] = docsData
 	}
 
-	et.Handover("perform")
-	docarr := performQuery(q, et)
-
-	et = et.Handover("ProcessHeaders")
-	h := make(headers)
-	q.ProcessHeaders(h)
-
-	docsData := make(map[string]interface{})
-	for _, d := range docarr {
-		docsData[fmt.Sprint(d.Id)] = s.Index.SplitDoc(d.Id)
-	}
-
-	data := make(map[string]interface{})
-	data["info"] = h
-	data["docs"] = docsData	
-
-	json, err := json.MarshalIndent(data, "", "    ")
+	result["info"] = resultInfo
+	json, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {
-		log.Printf("json err: %v", err)
+		log.Printf("HandleHTTPQuery: json.Marshal: %v", err)
 	}
 	w.Write(json)
 }
