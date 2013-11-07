@@ -6,7 +6,6 @@ package index
 import (
 	"strings"
 	"fmt"
-	"log"
 )
 
 func (in Index) SplitDoc(docId uint32) map[string]string {
