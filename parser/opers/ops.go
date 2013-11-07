@@ -35,17 +35,23 @@ type Op struct {
 
 type Query struct {
 	Stack []*Op
-	Err error
+	Err []error
 }
 
 var ErrSyntax = errors.New("query syntax error")
 var ErrLimitRange = errors.New("limit out of range")
 var ErrOffsetRange = errors.New("offset out of range")
+// Used in Generate if Parse error not handled
+var ErrTyp = errors.New("invalid operation type")
+
+func (q *Query) err(e error) {
+	q.Err = append(q.Err, e)
+}
 
 func (q *Query) Lim(l string) {
 	li, err := strconv.ParseInt(l, 10, 32)
 	if err != nil {
-		q.Err = ErrLimitRange
+		q.err(ErrLimitRange)
 	}
 	q.push(&Op{ typ: oLimit, intValue: []int64{ li } })
 }
@@ -53,7 +59,7 @@ func (q *Query) Lim(l string) {
 func (q *Query) Off(o string) {
 	oi, err := strconv.ParseInt(o, 10, 32)
 	if err != nil {
-		q.Err = ErrOffsetRange
+		q.err(ErrOffsetRange)
 	}
 	q.push(&Op{ typ: oOffset, intValue: []int64{ oi } })
 }

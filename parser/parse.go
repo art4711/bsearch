@@ -11,12 +11,12 @@ import (
 	"bsearch/parser/structured"
 )
 
-func ParseClassic(s string) (*opers.Op, error) {
+func ParseClassic(s string) (*opers.Op, []error) {
 	q := &classic.Parser{Buffer: s}
 
 	q.Init()
 	if err := q.Parse(); err != nil {
-		return nil, opers.ErrSyntax
+		return nil, append(q.Err, err)
 	}
 	q.Execute()
 
@@ -27,7 +27,7 @@ func ParseClassic(s string) (*opers.Op, error) {
 	return q.Stack[0], nil
 }
 
-func Classic(i *index.Index, s string) (ops.QueryOp, error) {
+func Classic(i *index.Index, s string) (ops.QueryOp, []error) {
 	o, err := ParseClassic(s)
 	if err != nil {
 		return nil, err
@@ -36,12 +36,12 @@ func Classic(i *index.Index, s string) (ops.QueryOp, error) {
 }
 
 
-func ParseStructured(s string) (*opers.Op, error) {
-	q := &structured.StructuredParser{Buffer: s}
+func ParseStructured(s string) (*opers.Op, []error) {
+	q := &structured.Parser{Buffer: s}
 
 	q.Init()
 	if err := q.Parse(); err != nil {
-		return nil, err
+		return nil, append(q.Err, err)
 	}
 	q.Execute()
 
@@ -52,7 +52,7 @@ func ParseStructured(s string) (*opers.Op, error) {
 	return q.Stack[0], nil
 }
 
-func Structured(i *index.Index, s string) (ops.QueryOp, error) {
+func Structured(i *index.Index, s string) (ops.QueryOp, []error) {
 	o, err := ParseStructured(s)
 	if err != nil {
 		return nil, err

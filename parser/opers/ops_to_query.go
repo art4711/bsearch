@@ -8,7 +8,7 @@ import (
 	"bsearch/ops"
 )
 
-func (o *Op) Generate(i *index.Index) (ops.QueryOp, error) {
+func (o *Op) Generate(i *index.Index) (ops.QueryOp, []error) {
 	var qc ops.QueryContainer
 
 	switch o.typ {

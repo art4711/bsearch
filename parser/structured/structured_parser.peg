@@ -5,7 +5,7 @@ package structured
 
 import "bsearch/parser/opers"
 
-type StructuredParser Peg {
+type Parser Peg {
 	opers.Query
 }
 

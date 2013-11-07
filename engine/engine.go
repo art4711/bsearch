@@ -62,9 +62,11 @@ func (s EngineState) handle(conn net.Conn) {
 	defer writer.Flush()
 
 	et = et.Handover("parse")
-	q, err := parser.Classic(s.Index, string(bq))
-	if err != nil {
-		fmt.Fprintf(writer, "info:error:%v\n", err)
+	q, errsl := parser.Classic(s.Index, string(bq))
+	if errsl != nil {
+		for k, v := range errsl {
+			fmt.Fprintf(writer, "info:error:%v:%v\n", k, v)
+		}
 		et.Stop()
 		return
 	}

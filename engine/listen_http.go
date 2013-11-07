@@ -34,10 +34,12 @@ func (s EngineState) HandleHTTPQuery(w http.ResponseWriter, req *http.Request) {
 	resultInfo := make(headers)
 
 	et.Handover("parse")
-	q, err := parser.Structured(s.Index, req.FormValue("q"))
-	if err != nil {
+	q, errsl := parser.Structured(s.Index, req.FormValue("q"))
+	if errsl != nil {
 		resultInfo.Add("error", "parse error")
-		resultInfo.Add("parse_error", fmt.Sprint(err))
+		for k, v := range errsl {
+			resultInfo.Add(fmt.Sprintf("parse_error%v", k), fmt.Sprint(v))
+		}
 	} else {
 		et.Handover("perform")
 		docarr := performQuery(q, et)
