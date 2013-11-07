@@ -6,6 +6,7 @@ package engine
 import (
 	"bsearch/index"
 	"bsearch/parser"
+	"bsearch/ops"
 	"fmt"
 	"log"
 	"net"
@@ -68,19 +69,10 @@ func (s EngineState) handle(conn net.Conn) {
 		return
 	}
 
-	docarr := make([]*index.IbDoc, 0)
-
 	et = et.Handover("performQuery")
-	search := index.NullDoc()
-	for {
-		d := q.NextDoc(search)
-		if d == nil {
-			break
-		}
-		docarr = append(docarr, d)
-		*search = *d
-		search.Inc()
-	}
+
+	docarr := performQuery(q, et)
+
 	et = et.Handover("ProcessHeaders")
 	h := make(headers)
 	q.ProcessHeaders(h)
@@ -103,4 +95,21 @@ func (s EngineState) handle(conn net.Conn) {
 		writer.WriteString("\n")
 	}
 	et.Stop()
+}
+
+func performQuery(q ops.QueryOp, et *timers.Event) []*index.IbDoc {
+	docarr := make([]*index.IbDoc, 0)
+
+	search := index.NullDoc()
+	for {
+		d := q.NextDoc(search)
+		if d == nil {
+			break
+		}
+		docarr = append(docarr, d)
+		*search = *d
+		search.Inc()
+	}
+
+	return docarr
 }

@@ -53,7 +53,7 @@ func ParseStructured(s string) (*opers.Op, error) {
 }
 
 func Structured(i *index.Index, s string) (ops.QueryOp, error) {
-	o, err := ParseClassic(s)
+	o, err := ParseStructured(s)
 	if err != nil {
 		return nil, err
 	}

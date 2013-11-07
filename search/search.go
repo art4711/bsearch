@@ -60,6 +60,7 @@ func main() {
 
 	go s.ControlHTTP(cchan)
 	go s.Listener()
+	go s.ListenHTTP()
 	for {
 		con := <- cchan
 		if con == "stop" {
