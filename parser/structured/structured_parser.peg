@@ -14,21 +14,16 @@ type Parser Peg {
 Query <- Operation !.
 
 # This is the general case, but we're currently doing special cases for all different opers:
-# Operation <- '(' OpType (s Name)? (s Value)* (s Operation)* ')'
-# Value <- IntValue / StrValue / OpValue
+Operation <- '(' OpType (s Name)? (s Value)* (s Operation)* ')' { p.OpEnd() }
 
-Operation <- Offset / Limit / CountAll / Intersection / Union / Attr
+OpType 	<- <opname> { p.OpStart(buffer[begin:end]) }
+Name 	<- '"' <generic_name> '"' { p.OpName(buffer[begin:end]) }
+Value	<- IntValue / StrValue #/ Operation /* Not supported for now. */
 
-Offset		<- '(offset' s IntValue { p.Off(buffer[begin:end]) } s Operation ')' { p.Pa() }
-Limit		<- '(limit' s IntValue { p.Lim(buffer[begin:end]) } s Operation ')'  { p.Pa() }
-CountAll	<- '(count_all' s Name { p.Countall(buffer[begin:end]) } s Operation ')' { p.Pa() }
-Intersection	<- '(intersection' { p.Inter() } (s Operation)+ ')' { p.Pa() }
-Union		<- '(union' { p.Union() } (s Operation)+ ')' { p.Pa() }
-Attr		<- '(attr' s Name ')' { p.Attr(buffer[begin:end]) }
-
-Name <- '"' <generic_name> '"'
-IntValue <- '[' s <number> s ']'
+IntValue <- '[' s <number> s ']' { p.OpIntValue(buffer[begin:end]) }
+StrValue <- '[' s <generic_name> s ']' { p.OpStrValue(buffer[begin:end]) }
 
 number <- [0-9]+
 s <- ' '+
-generic_name <- [a-z0-9_:]+
+generic_name <- [a-zA-Z0-9_:]+
+opname <- [a-z_]+

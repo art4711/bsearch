@@ -12,6 +12,8 @@ func (o *Op) Generate(i *index.Index) (ops.QueryOp, []error) {
 	var qc ops.QueryContainer
 
 	switch o.typ {
+	case oInvalid:
+		return nil, []error{ ErrTyp }
 	case oAttr:
 		return ops.NewAttr(i, o.name), nil
 	case oUnion:
