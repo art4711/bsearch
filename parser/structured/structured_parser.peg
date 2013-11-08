@@ -9,11 +9,8 @@ type Parser Peg {
 	opers.Query
 }
 
-# (offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))
-
 Query <- Operation !.
 
-# This is the general case, but we're currently doing special cases for all different opers:
 Operation <- '(' OpType (s Name)? (s Value)* (s Operation)* ')' { p.OpEnd() }
 
 OpType 	<- <opname> { p.OpStart(buffer[begin:end]) }
