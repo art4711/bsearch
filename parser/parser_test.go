@@ -6,6 +6,7 @@ package parser_test
 import (
 	. "bsearch/parser"
 	"testing"
+	"github.com/art4711/timers"
 )
 
 func TestClassic(t *testing.T) {
@@ -18,7 +19,7 @@ func TestClassic(t *testing.T) {
 
 func TestStructured(t *testing.T) {
 	q := `(offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))`
-	ops, err := ParseStructured(q)
+	ops, err := ParseStructured(q, timers.New().Start("hej"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,3 +29,12 @@ func TestStructured(t *testing.T) {
 	}
 }
 
+func BenchmarkStructured(b *testing.B) {
+	q := `(offset [ 17 ] (limit [ 10 ] (count_all "hejsan" (intersection (attr "a:a") (union (attr "b:a") (attr "b:b"))))))`
+	for i:= 0; i < b.N; i++ {
+		_, err := ParseStructured(q, timers.New().Start("hej"))
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
