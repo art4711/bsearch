@@ -33,20 +33,22 @@ func (s EngineState) HandleHTTPQuery(w http.ResponseWriter, req *http.Request) {
 	result := make(map[string]interface{})
 	resultInfo := make(headers)
 
-	et.Handover("parse")
-	q, errsl := parser.Structured(s.Index, req.FormValue("q"))
+	et = et.Handover("parse")
+	q, errsl := parser.Structured(s.Index, req.FormValue("q"), et)
 	if errsl != nil {
+		et = et.Handover("parseError")
 		resultInfo.Add("error", "parse error")
 		for k, v := range errsl {
 			resultInfo.Add(fmt.Sprintf("parse_error%v", k), fmt.Sprint(v))
 		}
 	} else {
-		et.Handover("perform")
+		et = et.Handover("perform")
 		docarr := performQuery(q, et)
 
 		et = et.Handover("ProcessHeaders")
 		q.ProcessHeaders(resultInfo)
 
+		et = et.Handover("BuildDocs")
 		docsData := make(map[string]interface{})
 		for _, d := range docarr {
 			docsData[fmt.Sprint(d.Id)] = s.Index.SplitDoc(d.Id)
@@ -55,9 +57,12 @@ func (s EngineState) HandleHTTPQuery(w http.ResponseWriter, req *http.Request) {
 	}
 
 	result["info"] = resultInfo
+	et = et.Handover("BuildJSON")
 	json, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {
 		log.Printf("HandleHTTPQuery: json.Marshal: %v", err)
 	}
+	et = et.Handover("WriteResult")
 	w.Write(json)
+	et.Stop()
 }

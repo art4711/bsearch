@@ -5,9 +5,9 @@ package engine
 
 import (
 	"net/http"
-	"time"
 	"encoding/json"
 	"fmt"
+	"github.com/art4711/timers"
 )
 
 func (s EngineState) ControlHTTP(cchan chan string) {
@@ -33,7 +33,7 @@ func (s EngineState) handleTimers(w http.ResponseWriter, req *http.Request) {
 		filt = req.Form["filt"][0]
 	}
 
-	s.Timer.Foreach(func (name []string, tot, avg, max, min time.Duration, cnt int64) {
+	s.Timer.Foreach(func (name []string, cnt *timers.Counts) {
 		if filt != "" && len(name) > 0 && name[0] != filt {
 			return
 		}
@@ -44,11 +44,13 @@ func (s EngineState) handleTimers(w http.ResponseWriter, req *http.Request) {
 			}
 			dp = dp[v].(map[string]interface{})
 		}
-		dp["cnt"] = fmt.Sprint(cnt)
-		dp["tot"] = tot.String()
-		dp["min"] = min.String()
-		dp["avg"] = avg.String()
-		dp["max"] = max.String()
+		dp["cnt"] = fmt.Sprint(cnt.Count)
+		dp["tot"] = cnt.Tot.String()
+		dp["min"] = cnt.Min.String()
+		dp["avg"] = cnt.Avg.String()
+		dp["max"] = cnt.Max.String()
+		dp["numgc"] = fmt.Sprint(cnt.NumGC)
+		dp["bytes"] = fmt.Sprint(cnt.BytesAlloc)
 	})
 	json, _ := json.MarshalIndent(data, "", "    ")
 	w.Write(json)

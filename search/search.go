@@ -30,7 +30,7 @@ func main() {
 	}
 
 	s := engine.EngineState{ Conf: make(bconf.Bconf) }
-	s.Timer = timers.New()
+	s.Timer = timers.NewMemStats()
 
 	timerConf := s.Timer.Start("loadconf")
 	s.Conf.LoadConfFile(flag.Arg(0))
