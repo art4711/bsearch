@@ -51,6 +51,7 @@ func (s EngineState) handleTimers(w http.ResponseWriter, req *http.Request) {
 		dp["max"] = cnt.Max.String()
 		dp["numgc"] = fmt.Sprint(cnt.NumGC)
 		dp["bytes"] = fmt.Sprint(cnt.BytesAlloc)
+		dp["gctime"] = fmt.Sprint(cnt.GCTime)
 	})
 	json, _ := json.MarshalIndent(data, "", "    ")
 	w.Write(json)
